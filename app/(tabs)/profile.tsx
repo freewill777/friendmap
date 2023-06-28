@@ -6,12 +6,14 @@ import {
   Image,
   Dimensions,
   FlatList,
+  ScrollView,
 } from "react-native";
 import { Heap } from "../Heap";
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import { host, mediaImages } from "../../appData";
+import { host } from "../../appData";
 import * as ImagePicker from "expo-image-picker";
+import { Video, ResizeMode } from "expo-av";
 
 const Profile = () => {
   const { user, userId } = useContext(Heap);
@@ -20,8 +22,13 @@ const Profile = () => {
   const { width, height } = Dimensions.get("window");
   const [profileImage, setProfileImage] = useState(null);
   const [photosLength, setPhotosLength] = useState(undefined);
+  const [videosLength, setVideosLength] = useState(undefined);
 
   const items = Array.apply(null, Array(photosLength)).map((v, i) => {
+    return { id: i, src: "http://placehold.it/200x200?text=" + (i + 1) };
+  });
+
+  const itemsVideo = Array.apply(null, Array(videosLength)).map((v, i) => {
     return { id: i, src: "http://placehold.it/200x200?text=" + (i + 1) };
   });
 
@@ -41,6 +48,19 @@ const Profile = () => {
         console.error(error);
       }
     })();
+  }, [userId]);
+
+  useEffect(() => {
+    async function getUserData() {
+      try {
+        const response = await fetch(`${host}/videos-length?userId=${userId}`);
+        const json = await response.json();
+        setVideosLength(json);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getUserData();
   }, [userId]);
 
   if (user === null) {
@@ -92,6 +112,8 @@ const Profile = () => {
     }
   };
 
+  const totalItems = [...items, ...itemsVideo];
+
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -107,7 +129,7 @@ const Profile = () => {
         </TouchableOpacity>
         <View style={{ flexDirection: "row" }}>
           <View style={{ marginRight: 5 }}>
-            <Text style={styles.statsItemValue}>12</Text>
+            <Text style={styles.statsItemValue}>{totalItems.length || ""}</Text>
             <Text style={styles.statsItemKey}>posts</Text>
           </View>
           <View style={{ marginRight: 5 }}>
@@ -127,28 +149,80 @@ const Profile = () => {
       <View style={styles.MainContainer}>
         {photosLength && userId ? (
           <FlatList
-            data={items}
+            data={totalItems}
+            renderItem={({ item }) =>
+              item.id < photosLength ? (
+                <View style={{ flex: 1, flexDirection: "column", margin: 1 }}>
+                  <Image
+                    style={{
+                      width: width / 3.0 - 16,
+                      height: height / 5.0,
+                      borderRadius: 8,
+                      margin: 8,
+                    }}
+                    source={{
+                      uri: `${host}/photo?userId=${userId}&index=${
+                        item.id % photosLength
+                      }`,
+                    }}
+                  />
+                </View>
+              ) : (
+                <TouchableOpacity activeOpacity={0.8}>
+                  <Video
+                    source={{
+                      uri: `${host}/video?userId=${userId}&index=${item.id}`,
+                    }}
+                    useNativeControls
+                    resizeMode={ResizeMode.CONTAIN}
+                    isLooping
+                    style={{
+                      width: width / 3.0 - 16,
+                      height: height / 5.0,
+                      borderRadius: 8,
+                      margin: 8,
+                    }}
+                  />
+                </TouchableOpacity>
+              )
+            }
+            numColumns={3}
+          />
+        ) : null}
+      </View>
+      {/* <View style={styles.MainContainer}>
+        <ScrollView>
+          <FlatList
+            data={itemsVideo}
+            keyExtractor={(item) => `${item.id}`}
             renderItem={({ item }) => (
-              <View style={{ flex: 1, flexDirection: "column", margin: 1 }}>
-                <Image
+              <TouchableOpacity activeOpacity={0.8}>
+                <Video
+                  source={{
+                    uri: `${host}/video?userId=${userId}&index=${item.id}`,
+                  }}
+                  useNativeControls
+                  resizeMode={ResizeMode.CONTAIN}
+                  isLooping
                   style={{
                     width: width / 3.0 - 16,
                     height: height / 5.0,
                     borderRadius: 8,
                     margin: 8,
                   }}
-                  source={{
-                    uri: `${host}/photo?userId=${userId}&index=${
-                      item.id % photosLength
-                    }`,
-                  }}
                 />
-              </View>
+              </TouchableOpacity>
             )}
             numColumns={3}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 2 + 5.0,
+              paddingBottom: 2,
+            }}
+            scrollEnabled={false}
           />
-        ) : null}
-      </View>
+        </ScrollView>
+      </View> */}
     </View>
   );
 };

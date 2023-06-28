@@ -73,7 +73,7 @@ const NewStoryScreen = () => {
           title="Play"
         />
         <Button onPress={() => setCameraVideo(null)} title="Discard" />
-        <Button onPress={() => setCameraVideo(null)} title="Save" />
+        {/* <Button onPress={() => setCameraVideo(null)} title="Save" /> */}
       </>
     );
   }

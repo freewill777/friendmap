@@ -78,6 +78,32 @@ const NewMediaScreen = () => {
     }
   };
 
+  const saveVideo = async () => {
+    alert(cameraVideo);
+    const formData = new FormData();
+    formData.append("files", {
+      uri: cameraVideo,
+      type: "video/quicktime",
+      name: "my-video.mov",
+    } as any);
+    formData.append("userId", userId!);
+    try {
+      const response = await fetch(`${host}/upload_files`, {
+        method: "POST",
+        headers: {
+          userId: userId,
+          mediaType: "video",
+        },
+        body: formData,
+      });
+      // const responseData = await response.json();
+    } catch (error) {
+      alert(error);
+    } finally {
+      setCameraVideo(null);
+    }
+  };
+
   if (cameraPhoto) {
     return (
       <>
@@ -102,7 +128,7 @@ const NewMediaScreen = () => {
           title="Play"
         />
         <Button onPress={() => setCameraVideo(null)} title="Discard" />
-        <Button onPress={() => setCameraVideo(null)} title="Save" />
+        <Button onPress={saveVideo} title="Post" />
       </>
     );
   }
