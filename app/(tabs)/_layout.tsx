@@ -12,8 +12,9 @@ import { Ionicons } from "@expo/vector-icons";
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
+  size?: number
 }) {
-  return <FontAwesome size={28} {...props} />;
+  return <FontAwesome size={!!props.size ? props.size : 28} {...props} />;
 }
 
 export default function TabLayout() {
@@ -72,6 +73,16 @@ export default function TabLayout() {
                     />
                   )}
                 </Pressable>
+                <Pressable>
+                  {({ pressed }) => (
+                    <Ionicons
+                      name="search"
+                      size={24}
+                      color="#696969"
+                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                    />
+                  )}
+                </Pressable>
               </View>
             );
           },
@@ -94,7 +105,9 @@ export default function TabLayout() {
         options={{
           title: "Add",
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="plus-circle" color={color} />
+            <View style={{ backgroundColor: 'white', marginTop: -40, borderRadius: 56, width: 56, height: 56, flexDirection: 'row', justifyContent: 'center' }}>
+              <TabBarIcon name="plus-circle" color='#6AB3A0' size={56} />
+            </View>
           ),
           unmountOnBlur: true,
           tabBarLabelStyle: { display: "none" },

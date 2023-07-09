@@ -12,6 +12,8 @@ import { Text, View } from "../../components/Themed";
 import { userPhotos, mediaImages, list, texts } from "../../appData";
 import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 
 import VirtualizedScrollView from "../VirtualizedScrollView";
 import { Size } from "../../constants/Sizes";
@@ -34,32 +36,52 @@ const StoriesThumbnails = () => {
       >
         <View
           style={{
-            padding: 4,
-            backgroundColor: "#6AB3AC",
-            marginVertical: 16,
-            marginHorizontal: 4,
-            borderRadius: 64,
+            backgroundColor: "#fff",
+            alignItems: "center",
           }}
         >
-          {item.key !== 1 ? (
-            <Image
-              source={userPhoto}
-              style={{ width: 72, height: 72, borderRadius: 64 }}
-            />
-          ) : (
-            <AntDesign
-              name="plus"
-              size={48}
-              color="white"
-              style={{ padding: 12 }}
-            />
-          )}
+          <View
+            style={{
+              padding: item.key !== 1 ? 2 : 3,
+              backgroundColor: "#6AB3AC",
+              marginVertical: 1,
+              marginHorizontal: 4,
+              borderRadius: 64,
+            }}
+          >
+            <View
+              style={{
+                padding: 1,
+                backgroundColor: item.key !== 1 ? "#fff" : "#b4d9cf",
+                borderRadius: 64,
+              }}
+            >
+              {item.key !== 1 ? (
+                <Image
+                  source={userPhoto}
+                  style={{ width: 56, height: 56, borderRadius: 64 }}
+                />
+              ) : (
+                <AntDesign
+                  name="plus"
+                  size={30}
+                  color="#5FA190"
+                  style={{ padding: 12 }}
+                />
+              )}
+            </View>
+          </View>
+          <Text style={{ color: "#000" }}>{item.name}</Text>
         </View>
       </TouchableOpacity>
     );
   };
+
   return (
-    <ScrollView horizontal style={{ width: width - 8 }}>
+    <ScrollView
+      horizontal
+      style={{ width, paddingStart: Size, marginVertical: Size / 2 }}
+    >
       <SafeAreaView>
         <FlatList
           data={stories}
@@ -85,20 +107,110 @@ const Feed = () => {
       <TouchableOpacity onPress={() => push("event")}>
         <View
           style={{
-            backgroundColor: "#6AB3AC",
-            borderRadius: 10,
-            overflow: "hidden",
-            marginHorizontal: Size,
+            backgroundColor: "#fff",
+            marginBottom: Size * 2,
           }}
         >
-          <Image source={mediaImage} style={{ width, height: 128 }} />
-          <Text style={{ color: "white", padding: 12 }}>{text}</Text>
+          <View
+            style={{
+              backgroundColor: "#fff",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: Size / 2,
+            }}
+          >
+            <Image
+              source={userPhotos[0]}
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 64,
+                marginRight: Size,
+              }}
+            />
+            <View style={{ flexGrow: 2, backgroundColor: "#fff" }}>
+              <Text style={{ color: "#000", fontSize: 18 }}>Alicia Sierra</Text>
+              <Text style={{ color: "#aaaaaa" }}>Bucharest, Romania</Text>
+            </View>
+            <TouchableOpacity>
+              <Ionicons name="ellipsis-vertical-sharp" size={24} color="#000" />
+            </TouchableOpacity>
+          </View>
+          <Text
+            style={{
+              color: "#aaaaaa",
+              paddingBottom: Size,
+              backgroundColor: "#fff",
+            }}
+          >
+            {text}
+          </Text>
+          <Image
+            source={mediaImage}
+            style={{
+              width: width - Size * 4,
+              height: 128,
+              borderTopRightRadius: 16,
+              borderTopLeftRadius: 16,
+            }}
+          />
+          <View
+            style={{
+              backgroundColor: "#fff",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: Size,
+              marginHorizontal: Size,
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                marginRight: Size * 2,
+                alignItems: "center",
+              }}
+            >
+              <Entypo
+                name="heart"
+                color="#aaa"
+                style={{ marginRight: Size / 2 }}
+              />
+              <Text style={{ color: "#aaa" }}>101 Likes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                flexGrow: 2,
+                alignItems: "center",
+              }}
+            >
+              <Entypo
+                name="chat"
+                color="#aaa"
+                style={{ marginRight: Size / 2 }}
+              />
+              <Text style={{ color: "#aaa" }}>100 Comments</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ flexDirection: "row", alignItems: "center" }}
+            >
+              <Entypo
+                name="share"
+                color="#aaa"
+                style={{ marginRight: Size / 2 }}
+              />
+              <Text style={{ color: "#aaa" }}>35 share</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </TouchableOpacity>
     );
   };
+
   return (
-    <ScrollView style={{ marginVertical: 10 }}>
+    <ScrollView style={{ marginVertical: Size }}>
       <SafeAreaView>
         <FlatList
           data={feed}
@@ -115,7 +227,14 @@ export default function TabOneScreen() {
     <SafeAreaView style={styles.container}>
       <VirtualizedScrollView>
         <StoriesThumbnails />
-        <Feed />
+        <View
+          style={{
+            backgroundColor: "#fff",
+            marginHorizontal: Size * 2,
+          }}
+        >
+          <Feed />
+        </View>
       </VirtualizedScrollView>
     </SafeAreaView>
   );
@@ -124,16 +243,6 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
+    backgroundColor: "#fff",
   },
 });

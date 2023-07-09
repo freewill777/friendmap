@@ -1,9 +1,12 @@
 export const list = [
-    { key: 1 },
-    { key: 2 },
-    { key: 3 },
-    { key: 4 },
-    { key: 5 }
+    { key: 1, name: 'Add Story' },
+    { key: 2, name: 'Alina' },
+    { key: 3, name: 'Daniela' },
+    { key: 4, name: 'Ionut' },
+    { key: 5, name: 'George' },
+    { key: 6, name: 'Mirela' },
+    { key: 7, name: 'Mihaela' },
+    { key: 8, name: 'Sorina' },
 ]
 
 export const userPhotos = [
@@ -13,6 +16,9 @@ export const userPhotos = [
     require("./assets/images/user4.jpg"),
     require("./assets/images/user5.jpg"),
     require("./assets/images/user6.jpg"),
+    require("./assets/images/user3.jpg"),
+    require("./assets/images/user2.jpg"),
+    require("./assets/images/user4.jpg"),
 ]
 
 export const mediaImages = [
