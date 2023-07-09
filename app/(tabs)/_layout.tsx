@@ -117,7 +117,7 @@ export default function TabLayout() {
           title: user ? user : "",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           tabBarLabelStyle: { display: "none" },
-          unmountOnBlur: true,
+          unmountOnBlur: false,
           headerRight: () => {
             if (user) {
               return (

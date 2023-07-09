@@ -14,6 +14,7 @@ import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 
 import VirtualizedScrollView from "../VirtualizedScrollView";
+import { Size } from "../../constants/Sizes";
 
 const StoriesThumbnails = () => {
   const stories = list;
@@ -86,8 +87,8 @@ const Feed = () => {
           style={{
             backgroundColor: "#6AB3AC",
             borderRadius: 10,
-            width: width - 8,
             overflow: "hidden",
+            marginHorizontal: Size,
           }}
         >
           <Image source={mediaImage} style={{ width, height: 128 }} />
