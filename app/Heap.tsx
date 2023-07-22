@@ -69,15 +69,19 @@ const HeapProvider = (props: { children: ReactNode }) => {
   }, [user]);
 
   useEffect(() => {
-    (async () => {
+    const getPhotos = async () => {
       try {
         const response = await fetch(`${host}/photos-length?userId=${userId}`);
         const json = await response.json();
         setPhotosLength(json);
       } catch (error) {
-        console.error(error);
+        console.error('))*', error);
       }
-    })();
+    }
+
+    if (userId) {
+      getPhotos()
+    }
   }, [userId]);
 
   useEffect(() => {
@@ -87,10 +91,11 @@ const HeapProvider = (props: { children: ReactNode }) => {
         const json = await response.json();
         setVideosLength(json);
       } catch (error) {
-        console.error(error);
       }
     }
-    getUserData();
+    if (userId !== "") {
+      getUserData();
+    }
   }, [userId]);
 
   const saveUserId = async (userId: string) => {

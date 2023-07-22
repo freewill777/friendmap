@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Dimensions,
   FlatList,
 } from "react-native";
@@ -14,8 +13,9 @@ import { host } from "../../appData";
 import * as ImagePicker from "expo-image-picker";
 import { Video, ResizeMode } from "expo-av";
 import { Size } from "../../constants/Sizes";
+import { Image } from 'expo-image';
 
-const Profile = memo(() => {
+const Profile = () => {
   const {
     user,
     userId,
@@ -78,7 +78,7 @@ const Profile = memo(() => {
           body: formData,
         } as any);
       } catch (error) {
-        console.error(error);
+        console.error('))+', error);
       }
     }
   };
@@ -118,6 +118,8 @@ const Profile = memo(() => {
         <Text style={styles.description}>🤠 💝 💯 🤠</Text>
       </View>
       <View style={styles.MainContainer}>
+        <View style={{ flex: 1, flexDirection: "column", margin: 1 }}>
+        </View>
         {photosLength && userId ? (
           <FlatList
             data={totalItems}
@@ -132,9 +134,8 @@ const Profile = memo(() => {
                       margin: 8,
                     }}
                     source={{
-                      uri: `${host}/photo?userId=${userId}&index=${
-                        item.id % photosLength
-                      }`,
+                      uri: `${host}/photo?userId=${userId}&index=${item.id % photosLength
+                        }`,
                     }}
                   />
                 </View>
@@ -163,7 +164,7 @@ const Profile = memo(() => {
       </View>
     </View>
   );
-});
+};
 
 export default Profile;
 

@@ -72,7 +72,7 @@ const NewMediaScreen = () => {
       });
       // const responseData = await response.json();
     } catch (error) {
-      console.error(error);
+      console.error('))-', error);
     } finally {
       setCameraPhoto(null);
     }

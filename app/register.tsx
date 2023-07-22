@@ -24,7 +24,7 @@ const RegisterScreen = () => {
   const os = Platform.OS;
   const { back, push } = useRouter();
 
-  const ready = Boolean(username) && Boolean(password);
+
 
   const handlePressLogin = async () => {
     if (!username) {
@@ -57,7 +57,7 @@ const RegisterScreen = () => {
         alert("Exista deja un cont asociat userului/emailuli");
       }
     } catch (e) {
-      console.error(e);
+      alert(e);
     }
   };
 

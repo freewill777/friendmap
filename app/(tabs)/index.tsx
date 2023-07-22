@@ -5,21 +5,40 @@ import {
   SafeAreaView,
   Dimensions,
   TouchableOpacity,
-  Image,
 } from "react-native";
+import { Image } from 'expo-image';
 import * as React from "react";
 import { Text, View } from "../../components/Themed";
-import { userPhotos, mediaImages, list, texts } from "../../appData";
+import { userPhotos, mediaImages, list, texts, host } from "../../appData";
 import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { Heap } from "../Heap";
 
 import VirtualizedScrollView from "../VirtualizedScrollView";
 import { Size } from "../../constants/Sizes";
 
 const StoriesThumbnails = () => {
-  const stories = list;
+  const { userId } = React.useContext(Heap);
+  const [stories, setStories] = React.useState([])
+
+  React.useEffect(() => {
+    const getStories = async () => {
+      const response = await fetch(`${host}/stories`, {
+        method: "GET",
+        headers: {
+          userId: userId,
+          mediaType: "video",
+        },
+
+      })
+      const responseData = await response.json();
+      console.log('responseData', responseData)
+      setStories(responseData)
+    }
+    getStories()
+  }, [])
   const { width } = Dimensions.get("window");
   const { push } = useRouter();
 
@@ -58,7 +77,7 @@ const StoriesThumbnails = () => {
             >
               {item.key !== 1 ? (
                 <Image
-                  source={userPhoto}
+                  source={{ uri: `${host}/avatar?userId=${item.id}` }}
                   style={{ width: 56, height: 56, borderRadius: 64 }}
                 />
               ) : (
@@ -71,27 +90,26 @@ const StoriesThumbnails = () => {
               )}
             </View>
           </View>
-          <Text style={{ color: "#000" }}>{item.name}</Text>
+          <Text style={{ color: "#000" }}>{item.userName}</Text>
         </View>
       </TouchableOpacity>
     );
   };
 
-  return (
-    <ScrollView
-      horizontal
-      style={{ width, paddingStart: Size, marginVertical: Size / 2 }}
-    >
-      <SafeAreaView>
-        <FlatList
-          data={stories}
-          renderItem={renderItem}
-          numColumns={list.length}
-          ItemSeparatorComponent={() => <View style={{ margin: 4 }} />}
-        />
-      </SafeAreaView>
-    </ScrollView>
-  );
+  return !!stories.length ? <ScrollView
+    horizontal
+    style={{ width, paddingStart: Size, marginVertical: Size / 2 }}
+  >
+    <SafeAreaView>
+      <FlatList
+        data={stories}
+        renderItem={renderItem}
+        numColumns={list.length}
+        ItemSeparatorComponent={() => <View style={{ margin: 4 }} />}
+      />
+    </SafeAreaView>
+  </ScrollView> : null
+    ;
 };
 
 const Feed = () => {

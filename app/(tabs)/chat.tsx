@@ -6,19 +6,50 @@ import {
   Text,
   ScrollView,
   SafeAreaView,
-  Image,
+  TextInput,
+  StyleSheet,
+  Pressable,
 } from "react-native";
-import { texts, list, userPhotos } from "../../appData";
+import { texts, list, userPhotos, host } from "../../appData";
 import { useRouter } from "expo-router";
 import VirtualizedScrollView from "../VirtualizedScrollView";
 import { Size } from "../../constants/Sizes";
+import socket from "../socket";
+import { useContext, useEffect, useState } from "react";
+import { Heap } from "../Heap";
+import { Image } from 'expo-image';
+
 
 const ChatScreen = () => {
+  const { userId, user } = useContext(Heap);
+
+  socket.connect()
+  const [inputText, setInputText] = useState("");
+
+  const [messageLedger, setMessageLedger] = useState([]);
+
+  socket.on('chat ledger', (ledger) => {
+    setMessageLedger(ledger)
+  })
+
+  useEffect(() => {
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (user === null) {
+      push("/login");
+    }
+  }, [user]);
+
+
   const { push } = useRouter();
   const { width } = Dimensions.get("window");
 
   const renderItem = ({ item }: any) => {
-    const text = texts[item.key - 1];
+
     return (
       <TouchableOpacity onPress={() => push("chatThread")}>
         <View
@@ -30,8 +61,9 @@ const ChatScreen = () => {
             marginHorizontal: Size,
           }}
         >
+
           <Image
-            source={userPhotos[0]}
+            source={{ uri: `${host}/avatar?userId=${item.author.id}` }}
             style={{ width: 56, height: 56, borderRadius: 64 }}
           />
           <View
@@ -50,35 +82,70 @@ const ChatScreen = () => {
               }}
             >
               <View>
-                <Text style={{ color: "black" }}>Cristi</Text>
+                <Text style={{ color: "black" }}>{item.author.name}</Text>
               </View>
               <View>
-                <Text style={{ color: "black" }}>10:20 am</Text>
+                <Text style={{ color: "black" }}>{item.date}</Text>
               </View>
             </View>
             <Text style={{ color: "#aaa" }} numberOfLines={1}>
-              {text}
+              {item.body}
             </Text>
           </View>
         </View>
       </TouchableOpacity>
     );
   };
+
   return (
-    <VirtualizedScrollView style={{ backgroundColor: "#fff" }}>
-      <ScrollView style={{ marginVertical: Size }}>
-        <SafeAreaView>
-          <FlatList
-            data={list}
-            renderItem={renderItem}
-            ItemSeparatorComponent={() => (
-              <View style={{ margin: 4, height: 10 }} />
-            )}
-          />
-        </SafeAreaView>
-      </ScrollView>
-    </VirtualizedScrollView>
+    Boolean(user) ? <>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+        <TextInput
+          style={{ flex: 1, height: 50, borderColor: "#696969", borderWidth: 1 }}
+          onChangeText={(text) => setInputText(text)}
+          value={inputText}
+        />
+        <Pressable style={styles.button} onPress={() => {
+          socket.emit("chat message", { body: inputText, author: { id: userId, name: user }, date: Date.now() });
+          setInputText("");
+        }} >
+          <Text style={styles.text}>Send</Text>
+        </Pressable>
+      </View>
+      <VirtualizedScrollView style={{ backgroundColor: "#fff" }}>
+        <ScrollView style={{ marginVertical: Size }}>
+          <SafeAreaView>
+            <FlatList
+              data={messageLedger}
+              renderItem={renderItem}
+              ItemSeparatorComponent={() => (
+                <View style={{ margin: 4, height: 10 }} />
+              )}
+            />
+          </SafeAreaView>
+        </ScrollView>
+      </VirtualizedScrollView>
+    </> : null
   );
 };
 
 export default ChatScreen;
+
+const styles = StyleSheet.create({
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: '#6AB3AC',
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: 'bold',
+    letterSpacing: 0.25,
+    color: 'white',
+  },
+});

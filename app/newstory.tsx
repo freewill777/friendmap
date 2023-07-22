@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import {
   Button,
   View,
@@ -17,9 +17,12 @@ import * as ImagePicker from "expo-image-picker";
 import { Entypo } from "@expo/vector-icons";
 
 import { colors } from "./colors";
+import { host } from "../appData";
+import { Heap } from "./Heap";
 
 const NewStoryScreen = () => {
   const [showIcon, setShowIcon] = useState(true);
+  const { userId } = useContext(Heap);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -50,14 +53,45 @@ const NewStoryScreen = () => {
     setCameraVideo(null);
   }, []);
 
+  const saveStory = async () => {
+    const formData = new FormData();
+
+    formData.append("files", {
+      uri: cameraPhoto,
+      type: "image/jpeg",
+      name: "my-image.jpg",
+    } as unknown as string);
+
+    formData.append("userId", userId!);
+
+    try {
+      await fetch(`${host}/upload_files`, {
+        method: "POST",
+        headers: {
+          userId: userId!,
+          mediaType: "image",
+          story: "yes"
+        },
+        body: formData,
+      });
+    } catch (error) {
+      alert(error);
+    } finally {
+      setCameraPhoto(null);
+    }
+  };
+
   if (cameraPhoto) {
     return (
       <>
         <Image style={{ flexGrow: 1 }} source={{ uri: cameraPhoto }} />
         <Button onPress={() => setCameraPhoto(null)} title="Discard" />
+        <Button onPress={saveStory} title="Save" />
       </>
     );
   }
+
+
 
   if (cameraVideo) {
     return (
@@ -73,7 +107,6 @@ const NewStoryScreen = () => {
           title="Play"
         />
         <Button onPress={() => setCameraVideo(null)} title="Discard" />
-        {/* <Button onPress={() => setCameraVideo(null)} title="Save" /> */}
       </>
     );
   }
@@ -234,7 +267,7 @@ const NewStoryScreen = () => {
           setIsRecording(false);
         })
         .catch((e: typeof Error) => {
-          console.error(e);
+          console.error(')))', e);
         });
       setCameraVideo(video.uri);
     }
