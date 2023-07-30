@@ -11,12 +11,13 @@ import { texts, list } from "../../appData";
 import { useRouter } from "expo-router";
 import VirtualizedScrollView from "../VirtualizedScrollView";
 import { useState } from "react";
+import { Entypo } from '@expo/vector-icons';
 
 const NotificationsScreen = () => {
   const { push } = useRouter();
-  const { width } = Dimensions.get("window");
+  const { width, height } = Dimensions.get("window");
 
-  const [items] = useState(list);
+  const [items] = useState([]);
   const renderItem = ({ item }: any) => {
     const text = texts[item.key - 1];
     return (
@@ -34,12 +35,19 @@ const NotificationsScreen = () => {
       </TouchableOpacity>
     );
   };
+
   return (
     <VirtualizedScrollView>
       <ScrollView style={{ marginVertical: 10 }}>
         <SafeAreaView>
+          {!items.length && (
+            <View style={{ marginLeft: width / 3, marginTop: height / 3.5 }}>
+              <Entypo name="notifications-off" size={124} color="#6AB3AC" />
+              <Text style={{ marginLeft: 2, fontSize: 20 }}>No notifications</Text>
+            </View>
+          )}
           <FlatList
-            data={list}
+            data={items}
             renderItem={renderItem}
             ItemSeparatorComponent={() => <View style={{ margin: 4 }} />}
           />

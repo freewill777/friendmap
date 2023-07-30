@@ -7,6 +7,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { logo } from "../../appData";
 import { useContext } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -26,11 +28,61 @@ export default function TabLayout() {
     setUser("");
   };
 
+  const HeaderToolbar = () => (
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <Pressable onPress={() => push("newevent")}>
+        {({ pressed }) => (
+          <MaterialIcons name="addchart"
+            size={24}
+            color="#696969"
+            style={{
+              marginRight: 15,
+              marginTop: 1,
+              opacity: pressed ? 0.5 : 1,
+            }}
+          />
+        )}
+      </Pressable>
+      <Pressable onPress={() => push("notifications")}>
+        {({ pressed }) => (
+          <Ionicons
+            name="ios-notifications-circle-outline"
+            size={28}
+            color="#696969"
+            style={{
+              marginRight: 15,
+              marginTop: 1,
+              opacity: pressed ? 0.5 : 1,
+            }}
+          />
+        )}
+      </Pressable>
+      <Pressable onPress={() => push("chat ")}>
+        {({ pressed }) => (
+          <Ionicons
+            name="ios-chatbubble-outline"
+            size={24}
+            color="#696969"
+            style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+          />
+        )}
+      </Pressable>
+      <Pressable>
+        {({ pressed }) => (
+          <Ionicons
+            name="search"
+            size={24}
+            color="#696969"
+            style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+          />
+        )}
+      </Pressable>
+    </View>
+  )
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#6AB3AC",
-        // tabBarItemStyle: { marginTop: -8 },
       }}
     >
       <Tabs.Screen
@@ -46,46 +98,7 @@ export default function TabLayout() {
               style={{ width: 72, height: 72, marginLeft: 5 }}
             />
           ),
-          headerRight: () => {
-            return (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Pressable onPress={() => push("notifications")}>
-                  {({ pressed }) => (
-                    <Ionicons
-                      name="ios-notifications-circle-outline"
-                      size={28}
-                      color="#696969"
-                      style={{
-                        marginRight: 15,
-                        marginTop: 1,
-                        opacity: pressed ? 0.5 : 1,
-                      }}
-                    />
-                  )}
-                </Pressable>
-                <Pressable onPress={() => push("chat ")}>
-                  {({ pressed }) => (
-                    <Ionicons
-                      name="ios-chatbubble-outline"
-                      size={24}
-                      color="#696969"
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
-                <Pressable>
-                  {({ pressed }) => (
-                    <Ionicons
-                      name="search"
-                      size={24}
-                      color="#696969"
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
-              </View>
-            );
-          },
+          headerRight: () => <HeaderToolbar />,
           unmountOnBlur: true,
         }}
       />
@@ -97,6 +110,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="bell" color={color} />,
           tabBarLabelStyle: { display: "none" },
           unmountOnBlur: true,
+          headerRight: () => <HeaderToolbar />
         }}
       />
       <Tabs.Screen
@@ -121,8 +135,10 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="wechat" color={color} />,
           tabBarLabelStyle: { display: "none" },
           unmountOnBlur: true,
+          headerRight: () => <HeaderToolbar />
         }}
       />
+
       <Tabs.Screen
         name="profile"
         key="profile"

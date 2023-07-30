@@ -24,6 +24,7 @@ const Profile = () => {
     items,
     itemsVideo,
     photosLength,
+    refreshData
   } = useContext(Heap);
   const { push } = useRouter();
 
@@ -34,6 +35,10 @@ const Profile = () => {
       push("/login");
     }
   }, [user]);
+
+  useEffect(() => {
+    refreshData()
+  }, []);
 
   if (user === null) {
     return (
@@ -78,7 +83,7 @@ const Profile = () => {
           body: formData,
         } as any);
       } catch (error) {
-        console.error('))+', error);
+        console.error('Avatar issue', error);
       }
     }
   };

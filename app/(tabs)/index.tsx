@@ -39,6 +39,7 @@ const StoriesThumbnails = () => {
     }
     getStories()
   }, [])
+
   const { width } = Dimensions.get("window");
   const { push } = useRouter();
 
@@ -116,7 +117,22 @@ const Feed = () => {
   const { width } = Dimensions.get("window");
   const { push } = useRouter();
 
-  const feed = list;
+  const [events, setEvents] = React.useState([])
+  const { userId } = React.useContext(Heap);
+  console.log('events', events)
+  React.useEffect(() => {
+    const getEvents = async () => {
+      const response = await fetch(`${host}/events`, {
+        method: "GET",
+        headers: {
+          userId: userId,
+        },
+      })
+      const responseData = await response.json();
+      setEvents(responseData)
+    }
+    getEvents()
+  }, [])
 
   const renderItem = ({ item }: any) => {
     const mediaImage = mediaImages[item.key - 1];
@@ -126,20 +142,19 @@ const Feed = () => {
         <View
           style={{
             backgroundColor: "#fff",
-            marginBottom: Size * 2,
           }}
         >
           <View
             style={{
               backgroundColor: "#fff",
               flexDirection: "row",
-              justifyContent: "space-between",
+              justifyContent: "flex-start",
               alignItems: "center",
-              marginBottom: Size / 2,
+              marginBottom: 8
             }}
           >
             <Image
-              source={userPhotos[0]}
+              source={{ uri: `${host}/event-media?eventId=${item._id}` }}
               style={{
                 width: 56,
                 height: 56,
@@ -148,29 +163,21 @@ const Feed = () => {
               }}
             />
             <View style={{ flexGrow: 2, backgroundColor: "#fff" }}>
-              <Text style={{ color: "#000", fontSize: 18 }}>Alicia Sierra</Text>
-              <Text style={{ color: "#aaaaaa" }}>Bucharest, Romania</Text>
+              <Text style={{ color: "#000", fontSize: 18 }}>{item.name}</Text>
+              <Text style={{ color: "#aaaaaa" }}>{item.date}</Text>
             </View>
             <TouchableOpacity>
               <Ionicons name="ellipsis-vertical-sharp" size={24} color="#000" />
             </TouchableOpacity>
           </View>
-          <Text
-            style={{
-              color: "#aaaaaa",
-              paddingBottom: Size,
-              backgroundColor: "#fff",
-            }}
-          >
-            {text}
-          </Text>
           <Image
-            source={mediaImage}
+            // source={mediaImage}
+            source={{ uri: `${host}/event-media?eventId=${item._id}` }}
             style={{
               width: width - Size * 4,
-              height: 128,
-              borderTopRightRadius: 16,
-              borderTopLeftRadius: 16,
+              height: 80,
+              borderBottomRightRadius: 2,
+              borderBottomLeftRadius: 2,
             }}
           />
           <View
@@ -228,15 +235,15 @@ const Feed = () => {
   };
 
   return (
-    <ScrollView style={{ marginVertical: Size }}>
+    !!events.length ? <ScrollView style={{ marginVertical: Size }}>
       <SafeAreaView>
         <FlatList
-          data={feed}
+          data={events}
           renderItem={renderItem}
           ItemSeparatorComponent={() => <View style={{ margin: 4 }} />}
         />
       </SafeAreaView>
-    </ScrollView>
+    </ScrollView> : null
   );
 };
 

@@ -63,7 +63,7 @@ const RegisterScreen = () => {
 
   const displayAccountType =
     selectedAccountType.charAt(0).toUpperCase() +
-      selectedAccountType.slice(1) || "";
+    selectedAccountType.slice(1) || "";
 
   return (
     <View style={{ ...styles.container, paddingTop: 120 }}>

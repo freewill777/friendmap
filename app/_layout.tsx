@@ -43,7 +43,7 @@ function RootLayoutNav() {
       <StatusBar style="dark" />
       <HeapProvider>
         <ThemeProvider
-          value={!(colorScheme === "dark") ? DefaultTheme : DefaultTheme}
+          value={DefaultTheme}
         >
           <Stack>
             <Stack.Screen
@@ -106,7 +106,23 @@ function RootLayoutNav() {
                 },
               }}
             />
+            <Stack.Screen
+              name="newevent"
+              key="new-event-screen"
+              options={{
+                headerTitle: "",
+                headerTransparent: true,
+                headerLeft: () => {
+                  return (
+                    <TouchableOpacity onPress={back}>
+                      <FontAwesome name="close" size={36} color="#696969" />
+                    </TouchableOpacity>
+                  );
+                },
+              }}
+            />
           </Stack>
+
         </ThemeProvider>
       </HeapProvider>
     </>

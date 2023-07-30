@@ -19,6 +19,7 @@ type Data = {
   itemsVideo: any;
   photosLength: any;
   videosLength: any;
+  refreshData: () => void
 };
 
 class UserStorage {
@@ -56,6 +57,16 @@ const HeapProvider = (props: { children: ReactNode }) => {
   const [photosLength, setPhotosLength] = useState<string | null>(null);
   const [videosLength, setVideosLength] = useState<string | null>(null);
 
+  const getPhotos = async () => {
+    try {
+      const response = await fetch(`${host}/photos-length?userId=${userId}`);
+      const json = await response.json();
+      setPhotosLength(json);
+    } catch (error) {
+      console.error('))*', error);
+    }
+  }
+
   useEffect(() => {
     (async () => {
       userStorage.getName().then((username) => setUser(username!));
@@ -69,16 +80,6 @@ const HeapProvider = (props: { children: ReactNode }) => {
   }, [user]);
 
   useEffect(() => {
-    const getPhotos = async () => {
-      try {
-        const response = await fetch(`${host}/photos-length?userId=${userId}`);
-        const json = await response.json();
-        setPhotosLength(json);
-      } catch (error) {
-        console.error('))*', error);
-      }
-    }
-
     if (userId) {
       getPhotos()
     }
@@ -113,6 +114,10 @@ const HeapProvider = (props: { children: ReactNode }) => {
 
   const { save, logout } = userStorage;
 
+  const refreshData = () => {
+    getPhotos()
+  }
+
   const data: Data = {
     user,
     setUser,
@@ -129,6 +134,7 @@ const HeapProvider = (props: { children: ReactNode }) => {
     setPhotosLength,
     photosLength,
     videosLength,
+    refreshData
   };
 
   return <Heap.Provider value={data}>{props.children}</Heap.Provider>;
