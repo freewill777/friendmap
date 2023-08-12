@@ -6,17 +6,26 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
-import { Heap } from "../Heap";
-import { useContext, useEffect, useState } from "react";
-import { useRouter } from "expo-router";
-import { host } from "../../appData";
+import { Heap } from "./Heap";
+import { useContext, useEffect, useState, memo } from "react";
+import { useRouter, usePathname, useSegments, useSearchParams } from "expo-router";
+import { host } from "../appData";
 import * as ImagePicker from "expo-image-picker";
 import { Video, ResizeMode } from "expo-av";
-import { Size } from "../../constants/Sizes";
+import { Size } from "../constants/Sizes";
 import { Image } from 'expo-image';
-import { User } from "../visitingprofile";
 
-const Profile = () => {
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  stats: {
+    description1: string;
+    description2: string;
+  }
+}
+
+const VisitingProfile = () => {
   const {
     user,
     userId,
@@ -30,6 +39,9 @@ const Profile = () => {
 
   const { push } = useRouter();
 
+  const { profileId } = useSearchParams();
+
+  console.log({ profileId })
   const { width, height } = Dimensions.get("window");
 
   useEffect(() => {
@@ -91,15 +103,16 @@ const Profile = () => {
   };
 
   const totalItems = [...items, ...itemsVideo];
-  const [currentUser, setcurrentUser] = useState<User | null>(null);
+
+  const [visitingUser, setVisitingUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${host}/user?id=${userId}`);
+        const response = await fetch(`${host}/user?id=${profileId}`);
         if (response.ok) {
           const userData = await response.json();
-          setcurrentUser(userData);
+          setVisitingUser(userData);
         } else {
           console.log("Failed to fetch user data");
         }
@@ -110,18 +123,17 @@ const Profile = () => {
 
     fetchData();
   }, []);
-
-  const currentEmail = currentUser !== null ? currentUser.email : ""
-  const currentName = currentUser !== null ? currentUser.name : ""
-  const currentDescription1 = currentUser !== null ? currentUser.stats.description1 : ""
-  const currentDescription2 = currentUser !== null ? currentUser.stats.description2 : ""
-  console.log('`${host}/avatar?userId=${userId}`', `${host}/avatar?userId=${userId}`)
+  console.log('visitingUser', visitingUser)
+  const visitingEmail = visitingUser !== null ? visitingUser.email : ""
+  const visitingName = visitingUser !== null ? visitingUser.name : ""
+  const visitingDescription1 = visitingUser !== null ? visitingUser.stats.description1 : ""
+  const visitingDescription2 = visitingUser !== null ? visitingUser.stats.description2 : ""
   return (
     <View style={{ flex: 1, marginHorizontal: Size }}>
       <View style={styles.container}>
         <TouchableOpacity activeOpacity={0.7} onPress={pickAvatar}>
           <Image
-            source={{ uri: `${host}/avatar?userId=${userId}` }}
+            source={{ uri: `${host}/avatar?userId=${profileId}` }}
             style={{
               width: width / 4.0,
               height: width / 4.0,
@@ -145,11 +157,11 @@ const Profile = () => {
         </View>
       </View>
       <View style={{ marginBottom: 8 }}>
-        <Text style={styles.description}>{currentDescription1}</Text>
-        <Text style={styles.description}>{currentDescription2}</Text>
+        <Text style={styles.description}>{visitingDescription1}</Text>
+        <Text style={styles.description}>{visitingDescription2}</Text>
         <Text style={styles.description}></Text>
-        <Text style={styles.description}>{userId && currentName}</Text>
-        <Text style={styles.description}>{userId ? currentEmail : user}</Text>
+        <Text style={styles.description}>{profileId && visitingName}</Text>
+        <Text style={styles.description}>{profileId ? visitingEmail : user}</Text>
       </View>
       <View style={styles.MainContainer}>
         <View style={{ flex: 1, flexDirection: "column", margin: 1 }}>
@@ -168,7 +180,7 @@ const Profile = () => {
                       margin: 8,
                     }}
                     source={{
-                      uri: `${host}/photo?userId=${userId}&index=${item.id % photosLength
+                      uri: `${host}/photo?userId=${profileId}&index=${item.id % photosLength
                         }`,
                     }}
                   />
@@ -177,7 +189,7 @@ const Profile = () => {
                 <TouchableOpacity activeOpacity={0.8}>
                   <Video
                     source={{
-                      uri: `${host}/video?userId=${userId}&index=${item.id}`,
+                      uri: `${host}/video?userId=${profileId}&index=${item.id}`,
                     }}
                     useNativeControls
                     resizeMode={ResizeMode.CONTAIN}
@@ -200,7 +212,7 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default VisitingProfile;
 
 const styles = StyleSheet.create({
   container: {

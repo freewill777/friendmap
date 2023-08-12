@@ -7,9 +7,9 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import { texts, list } from "../../appData";
+import { texts } from "../appData";
 import { useRouter } from "expo-router";
-import VirtualizedScrollView from "../VirtualizedScrollView";
+import VirtualizedScrollView from "./VirtualizedScrollView";
 import { useState } from "react";
 import { Entypo } from '@expo/vector-icons';
 

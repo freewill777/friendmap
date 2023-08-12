@@ -61,11 +61,14 @@ const ChatScreen = () => {
             marginHorizontal: Size,
           }}
         >
-
-          <Image
-            source={{ uri: `${host}/avatar?userId=${item.author.id}` }}
-            style={{ width: 56, height: 56, borderRadius: 64 }}
-          />
+          <Pressable onPress={() => {
+            push({ params: { profileId: item.author.id }, pathname: '/visitingprofile' })
+          }}>
+            <Image
+              source={{ uri: `${host}/avatar?userId=${item.author.id}` }}
+              style={{ width: 56, height: 56, borderRadius: 64 }}
+            />
+          </Pressable>
           <View
             style={{
               marginLeft: Size,

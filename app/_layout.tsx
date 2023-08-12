@@ -77,6 +77,22 @@ function RootLayoutNav() {
               }}
             />
             <Stack.Screen
+              name="story"
+              key="story-screen"
+              options={{
+                headerTitle: "",
+                // presentation: "modal",
+                headerTransparent: true,
+                headerLeft: () => {
+                  return (
+                    <TouchableOpacity onPress={back}>
+                      <FontAwesome name="close" size={36} color="#696969" />
+                    </TouchableOpacity>
+                  );
+                },
+              }}
+            />
+            <Stack.Screen
               name="newstory"
               key="new-story-screen"
               options={{

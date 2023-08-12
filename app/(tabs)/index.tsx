@@ -5,12 +5,13 @@ import {
   SafeAreaView,
   Dimensions,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import { Image } from 'expo-image';
 import * as React from "react";
 import { Text, View } from "../../components/Themed";
 import { userPhotos, mediaImages, list, texts, host } from "../../appData";
-import { useRouter } from "expo-router";
+import { useRouter, Link, useNavigation } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
@@ -18,6 +19,83 @@ import { Heap } from "../Heap";
 
 import VirtualizedScrollView from "../VirtualizedScrollView";
 import { Size } from "../../constants/Sizes";
+
+const Dropdown = ({ label, data, onSelect, selectedEvent, currentElement }) => {
+  const DropdownButton = React.useRef();
+  const [visible, setVisible] = React.useState(false);
+  const [selected, setSelected] = React.useState(undefined);
+  const [dropdownTop, setDropdownTop] = React.useState(0);
+
+  const toggleDropdown = (): void => {
+    visible ? setVisible(false) : openDropdown();
+  };
+
+  const openDropdown = (): void => {
+    DropdownButton.current.measure((_fx: number, _fy: number, _w: number, h: number, _px: number, py: number) => {
+      setDropdownTop(py + h);
+    });
+    setVisible(true);
+  };
+
+  const onItemPress = (item: any): void => {
+    onSelect(item);
+    setVisible(false);
+    console.log('item', item)
+    console.log('currentElement', currentElement)
+    if (item.label === 'Delete') {
+      fetch(`${host}/events/${currentElement._id}`, { method: 'DELETE' })
+    }
+  };
+
+  const renderItem = ({ item }: any): React.ReactElement<any, any> => (
+    <TouchableOpacity style={styles.item} onPress={() => onItemPress(item)}>
+      <Text style={{ color: 'black' }}>{item.label}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderDropdown = (): React.ReactElement<any, any> => {
+    return (
+      <Modal visible={visible} transparent animationType="none">
+        <TouchableOpacity
+          style={styles.overlay}
+          onPress={() => setVisible(false)}
+        >
+          <View style={[styles.dropdown, { top: dropdownTop }]}>
+            <FlatList
+              data={data}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    );
+  };
+
+  return (
+    <TouchableOpacity
+      ref={DropdownButton}
+      style={styles.button}
+      onPress={toggleDropdown}
+    >
+      {renderDropdown()}
+      <Text style={styles.buttonText}>
+        {(!!selected && selected.label) || label}
+      </Text>
+      <Text>&nbsp;</Text>
+      <Text>&nbsp;</Text>
+      <Ionicons name="ellipsis-vertical-sharp" size={24} color="#000" />
+      <Text>&nbsp;</Text>
+      <Text>&nbsp;</Text>
+    </TouchableOpacity>
+  );
+};
+
+const dropdownMenuItems = [
+  { label: 'Delete', value: '1' },
+  { label: 'Share', value: '2' },
+  { label: 'Edit', value: '3' },
+];
 
 const StoriesThumbnails = () => {
   const { userId } = React.useContext(Heap);
@@ -34,7 +112,6 @@ const StoriesThumbnails = () => {
 
       })
       const responseData = await response.json();
-      console.log('responseData', responseData)
       setStories(responseData)
     }
     getStories()
@@ -42,16 +119,16 @@ const StoriesThumbnails = () => {
 
   const { width } = Dimensions.get("window");
   const { push } = useRouter();
+  const navigation = useNavigation();
 
   const renderItem = ({ item }: any) => {
-    const userPhoto = userPhotos[item.key];
     return (
       <TouchableOpacity
         onPress={() => {
           if (item.key === 1) {
             return push("newstory");
           }
-          push("story");
+          navigation.navigate('story', { id: item.id });
         }}
       >
         <View
@@ -65,7 +142,7 @@ const StoriesThumbnails = () => {
               padding: item.key !== 1 ? 2 : 3,
               backgroundColor: "#6AB3AC",
               marginVertical: 1,
-              marginHorizontal: 4,
+              marginHorizontal: item.key === 1 ? 0 : 8,
               borderRadius: 64,
             }}
           >
@@ -91,7 +168,7 @@ const StoriesThumbnails = () => {
               )}
             </View>
           </View>
-          <Text style={{ color: "#000" }}>{item.userName}</Text>
+          <Text style={{ color: "#000", fontSize: 10 }}>{item.userName}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -118,8 +195,10 @@ const Feed = () => {
   const { push } = useRouter();
 
   const [events, setEvents] = React.useState([])
+  const [selectedEvent, setSelectedEvent] = React.useState(undefined);
+
   const { userId } = React.useContext(Heap);
-  console.log('events', events)
+
   React.useEffect(() => {
     const getEvents = async () => {
       const response = await fetch(`${host}/events`, {
@@ -137,6 +216,7 @@ const Feed = () => {
   const renderItem = ({ item }: any) => {
     const mediaImage = mediaImages[item.key - 1];
     const text = texts[item.key - 1];
+
     return (
       <TouchableOpacity onPress={() => push("event")}>
         <View
@@ -166,9 +246,7 @@ const Feed = () => {
               <Text style={{ color: "#000", fontSize: 18 }}>{item.name}</Text>
               <Text style={{ color: "#aaaaaa" }}>{item.date}</Text>
             </View>
-            <TouchableOpacity>
-              <Ionicons name="ellipsis-vertical-sharp" size={24} color="#000" />
-            </TouchableOpacity>
+            <Dropdown label="Select Item" selectedEvent={selectedEvent} currentElement={item} data={dropdownMenuItems} onSelect={() => setSelectedEvent(item._id)} />
           </View>
           <Image
             // source={mediaImage}
@@ -270,4 +348,45 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#efefef',
+    height: 50,
+    zIndex: 1,
+    borderRadius: 6
+  },
+  buttonText: {
+    flex: 1,
+    textAlign: 'center',
+  },
+  icon: {
+    marginRight: 10,
+  },
+  dropdown: {
+    position: 'absolute',
+    backgroundColor: '#fff',
+    width: '100%',
+    shadowColor: '#000000',
+    shadowRadius: 4,
+    shadowOffset: { height: 4, width: 0 },
+    shadowOpacity: 0.5,
+  },
+  overlay: {
+    width: '100%',
+    height: '100%',
+  },
+  item: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+  },
 });
+function useRef() {
+  throw new Error("Function not implemented.");
+}
+
+function useState(arg0: boolean): [any, any] {
+  throw new Error("Function not implemented.");
+}
+

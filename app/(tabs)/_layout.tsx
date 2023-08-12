@@ -103,11 +103,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="notifications"
-        key="notifications"
+        name="groups"
+        key="groups"
         options={{
-          title: "Notifications",
-          tabBarIcon: ({ color }) => <TabBarIcon name="bell" color={color} />,
+          title: "Groups",
+          tabBarIcon: ({ color }) => <TabBarIcon name="group" color={color} />,
           tabBarLabelStyle: { display: "none" },
           unmountOnBlur: true,
           headerRight: () => <HeaderToolbar />

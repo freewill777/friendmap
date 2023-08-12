@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   Dimensions,
+  KeyboardAvoidingView
 } from "react-native";
 
 import { useRouter } from "expo-router";
@@ -110,17 +111,17 @@ const NewEventScreen = () => {
       quality: 1,
     })) as any;
     if (!result.canceled) {
-
       setEventImage(result.assets[0].uri);
     }
   };
 
   return (
     <View style={{ ...styles.container }}>
+      <Text style={{ opacity: 0.3, marginBottom: 40 }}>Tap to select a photo</Text>
       <TouchableOpacity activeOpacity={0.7} onPress={pickPhoto}>
         <Image
           source={eventImage ? eventImage : logo}
-          style={{ minWidth: width, minHeight: 300, marginBottom: 90, marginTop: -60 }}
+          style={{ minWidth: width, minHeight: 300 }}
         />
       </TouchableOpacity>
       <TextInput
@@ -138,7 +139,7 @@ const NewEventScreen = () => {
         style={styles.input}
       />
 
-      <TouchableOpacity onPress={handlePress}>
+      <TouchableOpacity onPress={handlePress} style={{ marginBottom: 100 }}>
         <View>
           <Text style={styles.link}>Create event</Text>
         </View>
