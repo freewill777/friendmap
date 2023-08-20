@@ -79,7 +79,6 @@ const NewMediaScreen = () => {
   };
 
   const saveVideo = async () => {
-    alert(cameraVideo);
     const formData = new FormData();
     formData.append("files", {
       uri: cameraVideo,

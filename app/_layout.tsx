@@ -8,7 +8,7 @@ import { useFonts } from "expo-font";
 import { HeapProvider } from "./Heap";
 import { SplashScreen, Stack, useRouter } from "expo-router";
 import { useContext, useEffect } from "react";
-import { Touchable, TouchableOpacity, useColorScheme } from "react-native";
+import { Touchable, TouchableOpacity, View, useColorScheme } from "react-native";
 export { ErrorBoundary } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
@@ -19,6 +19,11 @@ export const unstable_settings = {
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    MenloRegular: require("../assets/fonts/Menlo-Regular.ttf"),
+    TalerSemibold: require("../assets/fonts/Taler-SemiBold.otf"),
+    NeueHaasDisplayBold: require("../assets/fonts/NeueHaasDisplayBold.ttf"),
+    NeueHaasDisplayMediu: require("../assets/fonts/NeueHaasDisplayMediu.ttf"),
+    NeueHaasDisplayThin: require("../assets/fonts/NeueHaasDisplayThin.ttf"),
     ...FontAwesome.font,
   });
 

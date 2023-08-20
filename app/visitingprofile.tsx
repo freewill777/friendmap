@@ -14,6 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Video, ResizeMode } from "expo-av";
 import { Size } from "../constants/Sizes";
 import { Image } from 'expo-image';
+import { fontProps } from "./(tabs)";
 
 export interface User {
   _id: string;
@@ -234,16 +235,19 @@ const styles = StyleSheet.create({
   },
   statsItemKey: {
     fontSize: 20,
+    ...fontProps
   },
   statsItemValue: {
     fontSize: 30,
     fontWeight: "bold",
+    ...fontProps
   },
   link: {
     fontSize: 25,
     fontWeight: "bold",
     color: "#6AB3AC",
     padding: 15,
+    ...fontProps
   },
   MainContainer: {
     justifyContent: "center",
@@ -259,5 +263,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 22,
     marginHorizontal: 10,
+    ...fontProps
   },
 });

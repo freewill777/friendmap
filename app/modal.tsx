@@ -2,6 +2,7 @@ import { StyleSheet } from "react-native";
 
 import EditScreenInfo from "../components/EditScreenInfo";
 import { Text, View } from "../components/Themed";
+import { fontProps } from "./(tabs)";
 
 export default function ModalScreen() {
   return (
@@ -26,6 +27,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "bold",
+    ...fontProps
   },
   separator: {
     marginVertical: 30,

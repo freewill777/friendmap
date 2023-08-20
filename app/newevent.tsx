@@ -15,6 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Heap } from "./Heap";
 import { host, logo } from "../appData";
 import { Image } from 'expo-image';
+import { fontProps } from "./(tabs)";
 
 const NewEventScreen = () => {
   const [eventName, setEventName] = useState("");
@@ -117,7 +118,7 @@ const NewEventScreen = () => {
 
   return (
     <View style={{ ...styles.container }}>
-      <Text style={{ opacity: 0.3, marginBottom: 40 }}>Tap to select a photo</Text>
+      <Text style={{ opacity: 0.3, marginBottom: 40, ...fontProps }}>Tap to select a photo</Text>
       <TouchableOpacity activeOpacity={0.7} onPress={pickPhoto}>
         <Image
           source={eventImage ? eventImage : logo}
@@ -165,12 +166,14 @@ const styles = StyleSheet.create({
     borderColor: "black",
     marginBottom: 10,
     color: 'black',
+    ...fontProps
   },
   link: {
     fontSize: 25,
     fontWeight: "bold",
     color: "#6AB3AC",
     padding: 15,
+    ...fontProps
   },
 });
 

@@ -10,6 +10,7 @@ import {
 import { Heap } from "./Heap";
 import { useRouter } from "expo-router";
 import { host } from "../appData";
+import { fontProps } from "./(tabs)";
 
 const LoginScreen = () => {
   const { save, setUser, setUserId, saveUserId } = useContext(Heap);
@@ -43,19 +44,25 @@ const LoginScreen = () => {
 
   return (
     <View style={{ ...styles.container, paddingTop: 200 }}>
-      <TextInput
-        value={username}
-        onChangeText={(username) => setUsername(username)}
-        placeholder={"Username"}
-        style={styles.input}
-      />
-      <TextInput
-        value={password}
-        onChangeText={(password) => setPassword(password)}
-        placeholder={"Password"}
-        secureTextEntry={true}
-        style={styles.input}
-      />
+      <View>
+        <Text style={styles.label}>Username/email</Text>
+        <TextInput
+          value={username}
+          onChangeText={(username) => setUsername(username)}
+          placeholder={"Username"}
+          style={styles.input}
+        />
+      </View>
+      <View>
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          value={password}
+          onChangeText={(password) => setPassword(password)}
+          placeholder={"Password"}
+          secureTextEntry={true}
+          style={styles.input}
+        />
+      </View>
 
       <TouchableOpacity onPress={handlePressLogin} disabled={!ready}>
         <View style={{ marginTop: 100 }}>
@@ -87,11 +94,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
     marginBottom: 10,
+    ...fontProps
   },
+  label: { color: "#696969", ...fontProps },
   link: {
     fontSize: 25,
     fontWeight: "bold",
     color: "#6AB3AC",
     padding: 15,
+    ...fontProps
   },
 });

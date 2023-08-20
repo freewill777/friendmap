@@ -6,19 +6,38 @@ import {
   Dimensions,
   TouchableOpacity,
   Modal,
+  StyleProp,
+  TextStyle,
+  Platform,
 } from "react-native";
 import { Image } from 'expo-image';
 import * as React from "react";
 import { Text, View } from "../../components/Themed";
-import { userPhotos, mediaImages, list, texts, host } from "../../appData";
-import { useRouter, Link, useNavigation } from "expo-router";
+import { list, host } from "../../appData";
+import { useRouter, useNavigation } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { Heap } from "../Heap";
+import { colors } from "../colors";
 
 import VirtualizedScrollView from "../VirtualizedScrollView";
 import { Size } from "../../constants/Sizes";
+import { generateBoxShadowStyle } from "../../utils/generateBoxShadowStyle";
+
+export const fontProps: StyleProp<TextStyle> = { fontFamily: 'NeueHaasDisplayMediu', letterSpacing: 0, textTransform: 'capitalize' }
+
+export const shadowProps = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+
+  elevation: 1,
+}
 
 const Dropdown = ({ label, data, onSelect, selectedEvent, currentElement }) => {
   const DropdownButton = React.useRef();
@@ -31,7 +50,7 @@ const Dropdown = ({ label, data, onSelect, selectedEvent, currentElement }) => {
   };
 
   const openDropdown = (): void => {
-    DropdownButton.current.measure((_fx: number, _fy: number, _w: number, h: number, _px: number, py: number) => {
+    DropdownButton.current?.measure((_fx: number, _fy: number, _w: number, h: number, _px: number, py: number) => {
       setDropdownTop(py + h);
     });
     setVisible(true);
@@ -40,17 +59,15 @@ const Dropdown = ({ label, data, onSelect, selectedEvent, currentElement }) => {
   const onItemPress = (item: any): void => {
     onSelect(item);
     setVisible(false);
-    console.log('item', item)
-    console.log('currentElement', currentElement)
     if (item.label === 'Delete') {
       fetch(`${host}/events/${currentElement._id}`, { method: 'DELETE' })
     }
   };
 
-  const renderItem = ({ item }: any): React.ReactElement<any, any> => (
+  const renderDropdownItem = ({ item }: any): React.ReactElement<any, any> => (
     <TouchableOpacity style={styles.item} onPress={() => onItemPress(item)}>
-      <Text style={{ color: 'black' }}>{item.label}</Text>
-    </TouchableOpacity>
+      <Text style={{ color: 'black', ...fontProps }}>{item.label}</Text>
+    </TouchableOpacity >
   );
 
   const renderDropdown = (): React.ReactElement<any, any> => {
@@ -63,7 +80,7 @@ const Dropdown = ({ label, data, onSelect, selectedEvent, currentElement }) => {
           <View style={[styles.dropdown, { top: dropdownTop }]}>
             <FlatList
               data={data}
-              renderItem={renderItem}
+              renderItem={renderDropdownItem}
               keyExtractor={(item, index) => index.toString()}
             />
           </View>
@@ -75,7 +92,7 @@ const Dropdown = ({ label, data, onSelect, selectedEvent, currentElement }) => {
   return (
     <TouchableOpacity
       ref={DropdownButton}
-      style={styles.button}
+      style={{ ...styles.button, marginRight: 10, ...(visible ? { backgroundColor: '#efefef' } : null) }}
       onPress={toggleDropdown}
     >
       {renderDropdown()}
@@ -84,7 +101,9 @@ const Dropdown = ({ label, data, onSelect, selectedEvent, currentElement }) => {
       </Text>
       <Text>&nbsp;</Text>
       <Text>&nbsp;</Text>
-      <Ionicons name="ellipsis-vertical-sharp" size={24} color="#000" />
+      <Text>&nbsp;</Text>
+      <Ionicons name="ellipsis-horizontal-sharp" size={24} color="#000" />
+      <Text>&nbsp;</Text>
       <Text>&nbsp;</Text>
       <Text>&nbsp;</Text>
     </TouchableOpacity>
@@ -109,7 +128,6 @@ const StoriesThumbnails = () => {
           userId: userId,
           mediaType: "video",
         },
-
       })
       const responseData = await response.json();
       setStories(responseData)
@@ -133,7 +151,7 @@ const StoriesThumbnails = () => {
       >
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: "transparent",
             alignItems: "center",
           }}
         >
@@ -141,7 +159,7 @@ const StoriesThumbnails = () => {
             style={{
               padding: item.key !== 1 ? 2 : 3,
               backgroundColor: "#6AB3AC",
-              marginVertical: 1,
+              marginTop: 8,
               marginHorizontal: item.key === 1 ? 0 : 8,
               borderRadius: 64,
             }}
@@ -168,7 +186,7 @@ const StoriesThumbnails = () => {
               )}
             </View>
           </View>
-          <Text style={{ color: "#000", fontSize: 10 }}>{item.userName}</Text>
+          <Text style={{ color: "#000", fontSize: 10, ...fontProps }}>{item.userName}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -183,7 +201,7 @@ const StoriesThumbnails = () => {
         data={stories}
         renderItem={renderItem}
         numColumns={list.length}
-        ItemSeparatorComponent={() => <View style={{ margin: 4 }} />}
+        ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
       />
     </SafeAreaView>
   </ScrollView> : null
@@ -192,15 +210,14 @@ const StoriesThumbnails = () => {
 
 const Feed = () => {
   const { width } = Dimensions.get("window");
-  const { push } = useRouter();
-
+  const navigation = useNavigation();
   const [events, setEvents] = React.useState([])
   const [selectedEvent, setSelectedEvent] = React.useState(undefined);
 
   const { userId } = React.useContext(Heap);
 
   React.useEffect(() => {
-    const getEvents = async () => {
+    (async () => {
       const response = await fetch(`${host}/events`, {
         method: "GET",
         headers: {
@@ -209,63 +226,58 @@ const Feed = () => {
       })
       const responseData = await response.json();
       setEvents(responseData)
-    }
-    getEvents()
+    })()
   }, [])
 
   const renderItem = ({ item }: any) => {
-    const mediaImage = mediaImages[item.key - 1];
-    const text = texts[item.key - 1];
-
     return (
-      <TouchableOpacity onPress={() => push("event")}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("event", { id: item._id })}
+        style={{
+          marginBottom: 20,
+          marginHorizontal: 15
+
+        }}
+      >
         <View
           style={{
             backgroundColor: "#fff",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
           }}
         >
-          <View
-            style={{
-              backgroundColor: "#fff",
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              marginBottom: 8
-            }}
-          >
-            <Image
-              source={{ uri: `${host}/event-media?eventId=${item._id}` }}
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 64,
-                marginRight: Size,
-              }}
-            />
-            <View style={{ flexGrow: 2, backgroundColor: "#fff" }}>
-              <Text style={{ color: "#000", fontSize: 18 }}>{item.name}</Text>
-              <Text style={{ color: "#aaaaaa" }}>{item.date}</Text>
-            </View>
-            <Dropdown label="Select Item" selectedEvent={selectedEvent} currentElement={item} data={dropdownMenuItems} onSelect={() => setSelectedEvent(item._id)} />
-          </View>
           <Image
-            // source={mediaImage}
             source={{ uri: `${host}/event-media?eventId=${item._id}` }}
             style={{
-              width: width - Size * 4,
-              height: 80,
-              borderBottomRightRadius: 2,
-              borderBottomLeftRadius: 2,
+              width: 56,
+              height: 56,
+              borderRadius: 64,
+              margin: Size,
             }}
           />
+          <View style={{ flexGrow: 2, backgroundColor: "#fff" }}>
+            <Text style={{ color: "#000", fontSize: 14, ...fontProps }}>{item.name}</Text>
+            <Text style={{ color: "#aaaaaa", ...fontProps }}>{item.date}</Text>
+          </View>
+          <Dropdown label="Select Item" selectedEvent={selectedEvent} currentElement={item} data={dropdownMenuItems} onSelect={() => setSelectedEvent(item._id)} />
+        </View>
+        <Image
+          source={{ uri: `${host}/event-media?eventId=${item._id}` }}
+          style={{
+            height: 80,
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+          }}
+        />
+        <View style={{ backgroundColor: '#fff', ...styles.shadowProp }}>
           <View
             style={{
               backgroundColor: "#fff",
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              marginTop: Size,
-              marginHorizontal: Size,
+              margin: Size,
             }}
           >
             <TouchableOpacity
@@ -280,7 +292,7 @@ const Feed = () => {
                 color="#aaa"
                 style={{ marginRight: Size / 2 }}
               />
-              <Text style={{ color: "#aaa" }}>101 Likes</Text>
+              <Text style={{ color: "#aaa", ...fontProps }}>101 Likes</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -294,7 +306,7 @@ const Feed = () => {
                 color="#aaa"
                 style={{ marginRight: Size / 2 }}
               />
-              <Text style={{ color: "#aaa" }}>100 Comments</Text>
+              <Text style={{ color: "#aaa", ...fontProps }}>100 Comments</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{ flexDirection: "row", alignItems: "center" }}
@@ -304,11 +316,11 @@ const Feed = () => {
                 color="#aaa"
                 style={{ marginRight: Size / 2 }}
               />
-              <Text style={{ color: "#aaa" }}>35 share</Text>
+              <Text style={{ color: "#aaa", ...fontProps }}>35 share</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity >
     );
   };
 
@@ -327,15 +339,10 @@ const Feed = () => {
 
 export default function TabOneScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView>
       <VirtualizedScrollView>
-        <StoriesThumbnails />
-        <View
-          style={{
-            backgroundColor: "#fff",
-            marginHorizontal: Size * 2,
-          }}
-        >
+        <View style={{ backgroundColor: colors.white }}>
+          <StoriesThumbnails />
           <Feed />
         </View>
       </VirtualizedScrollView>
@@ -344,14 +351,9 @@ export default function TabOneScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#efefef',
     height: 50,
     zIndex: 1,
     borderRadius: 6
@@ -381,12 +383,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
   },
+  shadowProp: {
+    ...generateBoxShadowStyle(0, 1, '#99a9a9', 0.35, 1, 2, '#99a9a9'),
+
+  },
 });
-function useRef() {
-  throw new Error("Function not implemented.");
-}
-
-function useState(arg0: boolean): [any, any] {
-  throw new Error("Function not implemented.");
-}
-

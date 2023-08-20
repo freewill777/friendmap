@@ -19,6 +19,7 @@ import { Entypo } from "@expo/vector-icons";
 import { colors } from "./colors";
 import { host } from "../appData";
 import { Heap } from "./Heap";
+import { fontProps } from "./(tabs)";
 
 const NewStoryScreen = () => {
   const [showIcon, setShowIcon] = useState(true);
@@ -81,6 +82,32 @@ const NewStoryScreen = () => {
     }
   };
 
+  const saveVideo = async () => {
+    const formData = new FormData();
+    formData.append("files", {
+      uri: cameraVideo,
+      type: "video/quicktime",
+      name: "my-video.mov",
+    } as any);
+    formData.append("userId", userId!);
+    try {
+      await fetch(`${host}/upload_files`, {
+        method: "POST",
+        headers: {
+          userId: userId!,
+          mediaType: "video",
+          story: "yes"
+        },
+        body: formData,
+      });
+      // const responseData = await response.json();
+    } catch (error) {
+      alert(error);
+    } finally {
+      setCameraVideo(null);
+    }
+  };
+
   if (cameraPhoto) {
     return (
       <>
@@ -106,6 +133,7 @@ const NewStoryScreen = () => {
           onPress={() => (video.current as any).playAsync()}
           title="Play"
         />
+        <Button onPress={saveVideo} title="Save" />
         <Button onPress={() => setCameraVideo(null)} title="Discard" />
       </>
     );
@@ -231,7 +259,7 @@ const NewStoryScreen = () => {
           }}
         >
           <TouchableOpacity onPress={pickImage}>
-            <Text style={{ color: "white" }}>Import Photo</Text>
+            <Text style={{ color: "white", ...fontProps }}>Import Photo</Text>
           </TouchableOpacity>
         </View>
       </View>
