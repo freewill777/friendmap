@@ -18,7 +18,7 @@ import socket from "../socket";
 import { useContext, useEffect, useState } from "react";
 import { Heap } from "../Heap";
 import { Image } from 'expo-image';
-
+import { fontProps } from ".";
 
 const ChatScreen = () => {
   const { userId, user } = useContext(Heap);
@@ -91,7 +91,7 @@ const ChatScreen = () => {
                 <Text style={{ color: "black" }}>{item.date}</Text>
               </View>
             </View>
-            <Text style={{ color: "#aaa" }} numberOfLines={1}>
+            <Text style={{ color: "#aaa", ...fontProps }} numberOfLines={1}>
               {item.body}
             </Text>
           </View>

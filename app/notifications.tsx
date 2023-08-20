@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import VirtualizedScrollView from "./VirtualizedScrollView";
 import { useState } from "react";
 import { Entypo } from '@expo/vector-icons';
+import { fontProps } from "./(tabs)";
 
 const NotificationsScreen = () => {
   const { push } = useRouter();
@@ -30,7 +31,7 @@ const NotificationsScreen = () => {
             overflow: "hidden",
           }}
         >
-          <Text style={{ color: "white", padding: 12 }}>{text}</Text>
+          <Text style={{ color: "white", padding: 12, ...fontProps }}>{text}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -41,9 +42,9 @@ const NotificationsScreen = () => {
       <ScrollView style={{ marginVertical: 10 }}>
         <SafeAreaView>
           {!items.length && (
-            <View style={{ marginLeft: width / 3, marginTop: height / 3.5 }}>
+            <View style={{ marginLeft: width / 3, flex: 1, marginTop: height / 3.5 }}>
               <Entypo name="notifications-off" size={124} color="#6AB3AC" />
-              <Text style={{ marginLeft: 2, fontSize: 20 }}>No notifications</Text>
+              <Text style={{ fontSize: 20, ...fontProps, marginLeft: -20 }}>No notifications</Text>
             </View>
           )}
           <FlatList

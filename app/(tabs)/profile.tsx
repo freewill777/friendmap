@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
+  VirtualizedList,
+  ScrollView,
 } from "react-native";
 import { Heap } from "../Heap";
 import { useContext, useEffect, useState } from "react";
@@ -15,6 +17,72 @@ import { Video, ResizeMode } from "expo-av";
 import { Size } from "../../constants/Sizes";
 import { Image } from 'expo-image';
 import { User } from "../visitingprofile";
+import { fontProps } from ".";
+
+type MediaElementProps = { storyIndex: number, setStoryIndex?: React.Dispatch<React.SetStateAction<number>>, userId: string }
+
+const MediaElement = ({ storyIndex, userId: id }: MediaElementProps) => {
+  const { width, height } = Dimensions.get("window");
+  const [mode, setMode] = useState<'img' | 'video'>('img')
+  const [loading, setLoading] = useState(true);
+  const uri = `${host}/media?userId=${id}&index=${storyIndex}`
+
+  useEffect(() => {
+    fetch(uri)
+      .then(response => {
+        if (response.headers.get('content-type')?.startsWith('image/')) {
+          setMode('img');
+          setLoading(false)
+        } else if (response.headers.get('content-type')?.startsWith('video/')) {
+          setMode('video');
+          setLoading(false)
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching resource:', error);
+      });
+  }, [uri]);
+
+  if (!loading) {
+    if (mode === 'img') return (
+      <Image
+        cachePolicy='none'
+        source={{ uri }}
+        style={{
+          width: width,
+          height: height / 4,
+          marginTop: 10,
+          borderTopLeftRadius: 20,
+          borderBottomLeftRadius: 20,
+          borderTopRightRadius: width / 10,
+          borderBottomRightRadius: width / 10
+        }}
+        key={storyIndex + 'image'}
+      />
+    )
+    if (mode === 'video') return (
+      <Video
+        source={{ uri }}
+        useNativeControls
+        resizeMode={ResizeMode.CONTAIN}
+        isLooping
+        style={{
+          width: width,
+          height: height / 4,
+          marginTop: 10,
+          borderTopLeftRadius: 20,
+          borderBottomLeftRadius: 20,
+          borderTopRightRadius: width / 10,
+          borderBottomRightRadius: width / 10
+
+        }}
+        key={storyIndex + 'video'}
+      />
+    )
+  } else {
+    return <></>
+  }
+}
 
 const Profile = () => {
   const {
@@ -25,6 +93,7 @@ const Profile = () => {
     items,
     itemsVideo,
     photosLength,
+    videosLength,
     refreshData
   } = useContext(Heap);
 
@@ -33,19 +102,21 @@ const Profile = () => {
   const { width, height } = Dimensions.get("window");
 
   useEffect(() => {
+    refreshData()
+  }, []);
+
+  useEffect(() => {
     if (user === null) {
       push("/login");
     }
   }, [user]);
 
-  useEffect(() => {
-    refreshData()
-  }, []);
+
 
   if (user === null) {
     return (
       <View style={styles.containerCenter}>
-        <Text style={{ ...styles.title, marginTop: 100, marginBottom: 150 }}>
+        <Text style={{ ...styles.title, marginTop: 100, ...fontProps }}>
           Not authenticated
         </Text>
         <TouchableOpacity onPress={() => push("/login")}>
@@ -54,7 +125,7 @@ const Profile = () => {
         <TouchableOpacity onPress={() => push("/register")}>
           <Text style={styles.link}>Create account</Text>
         </TouchableOpacity>
-      </View>
+      </View >
     );
   }
 
@@ -115,7 +186,7 @@ const Profile = () => {
   const currentName = currentUser !== null ? currentUser.name : ""
   const currentDescription1 = currentUser !== null ? currentUser.stats.description1 : ""
   const currentDescription2 = currentUser !== null ? currentUser.stats.description2 : ""
-  console.log('`${host}/avatar?userId=${userId}`', `${host}/avatar?userId=${userId}`)
+
   return (
     <View style={{ flex: 1, marginHorizontal: Size }}>
       <View style={styles.container}>
@@ -152,49 +223,24 @@ const Profile = () => {
         <Text style={styles.description}>{userId ? currentEmail : user}</Text>
       </View>
       <View style={styles.MainContainer}>
-        <View style={{ flex: 1, flexDirection: "column", margin: 1 }}>
-        </View>
-        {photosLength && userId ? (
-          <FlatList
-            data={totalItems}
-            renderItem={({ item }) =>
-              item.id < photosLength ? (
-                <View style={{ flex: 1, flexDirection: "column", margin: 1 }}>
-                  <Image
-                    style={{
-                      width: width / 3.0 - 16,
-                      height: height / 5.0,
-                      borderRadius: 8,
-                      margin: 8,
-                    }}
-                    source={{
-                      uri: `${host}/photo?userId=${userId}&index=${item.id % photosLength
-                        }`,
-                    }}
-                  />
-                </View>
-              ) : (
-                <TouchableOpacity activeOpacity={0.8}>
-                  <Video
-                    source={{
-                      uri: `${host}/video?userId=${userId}&index=${item.id}`,
-                    }}
-                    useNativeControls
-                    resizeMode={ResizeMode.CONTAIN}
-                    isLooping
-                    style={{
-                      width: width / 3.0 - 16,
-                      height: height / 5.0,
-                      borderRadius: 8,
-                      margin: 8,
-                    }}
-                  />
-                </TouchableOpacity>
-              )
-            }
-            numColumns={3}
-          />
-        ) : null}
+        {userId && <ScrollView >
+          <MediaElement userId={userId} storyIndex={0} />
+          <MediaElement userId={userId} storyIndex={1} />
+          <MediaElement userId={userId} storyIndex={2} />
+          <MediaElement userId={userId} storyIndex={3} />
+          <MediaElement userId={userId} storyIndex={4} />
+          <MediaElement userId={userId} storyIndex={5} />
+          <MediaElement userId={userId} storyIndex={6} />
+          <MediaElement userId={userId} storyIndex={7} />
+          <MediaElement userId={userId} storyIndex={8} />
+          <MediaElement userId={userId} storyIndex={9} />
+          <MediaElement userId={userId} storyIndex={10} />
+          <MediaElement userId={userId} storyIndex={11} />
+          <MediaElement userId={userId} storyIndex={12} />
+          <MediaElement userId={userId} storyIndex={13} />
+          <MediaElement userId={userId} storyIndex={14} />
+          <MediaElement userId={userId} storyIndex={15} />
+        </ScrollView>}
       </View>
     </View>
   );
@@ -222,16 +268,19 @@ const styles = StyleSheet.create({
   },
   statsItemKey: {
     fontSize: 20,
+    ...fontProps
   },
   statsItemValue: {
     fontSize: 30,
     fontWeight: "bold",
+    ...fontProps
   },
   link: {
     fontSize: 25,
     fontWeight: "bold",
     color: "#6AB3AC",
     padding: 15,
+    ...fontProps
   },
   MainContainer: {
     justifyContent: "center",
@@ -247,5 +296,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 22,
     marginHorizontal: 10,
+    ...fontProps
   },
 });

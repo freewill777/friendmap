@@ -12,6 +12,7 @@ import {
 import { Heap } from "./Heap";
 import { useRouter } from "expo-router";
 import { host, logo } from "../appData";
+import { fontProps } from "./(tabs)";
 
 const RegisterScreen = () => {
   const { save, setUser, saveUserId, setUserId } = useContext(Heap);
@@ -83,10 +84,10 @@ const RegisterScreen = () => {
             marginBottom: 4,
           }}
         >
-          <Text style={{ color: "#696969", padding: 8 }}>
+          <Text style={{ color: "#696969", padding: 8, ...fontProps }}>
             Alege tipul de cont:
           </Text>
-          <Text style={{ color: "#696969", padding: 8, marginEnd: 10 }}>
+          <Text style={{ color: "#696969", padding: 8, marginEnd: 10, ...fontProps }}>
             {displayAccountType}
           </Text>
         </View>
@@ -150,7 +151,7 @@ const RegisterScreen = () => {
 
       <View>
         {os === "ios" ? (
-          <Text style={{ color: "#696969" }}>Username</Text>
+          <Text style={styles.label}>Username</Text>
         ) : null}
         <TextInput
           value={username}
@@ -158,7 +159,7 @@ const RegisterScreen = () => {
           placeholder={"Username"}
           style={styles.input}
         />
-        {os === "ios" ? <Text style={{ color: "#696969" }}>Email</Text> : null}
+        {os === "ios" ? <Text style={styles.label}>Email</Text> : null}
         <TextInput
           value={email}
           onChangeText={(email) => setEmail(email)}
@@ -166,7 +167,7 @@ const RegisterScreen = () => {
           style={styles.input}
         />
         {os === "ios" ? (
-          <Text style={{ color: "#696969" }}>Password</Text>
+          <Text style={styles.label}>Password</Text>
         ) : null}
         <TextInput
           value={password}
@@ -203,7 +204,9 @@ const styles = StyleSheet.create({
     borderColor: "black",
     marginBottom: 10,
     borderRadius: 4,
+    ...fontProps
   },
+  label: { color: "#696969", ...fontProps },
   link: {
     fontSize: 25,
     fontWeight: "bold",
@@ -211,6 +214,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 5,
     margin: 3,
+    ...fontProps
   },
   selectedItem: {
     backgroundColor: "#616961",

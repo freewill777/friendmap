@@ -10,6 +10,7 @@ import {
 import { list, texts } from "../appData";
 import { useRouter } from "expo-router";
 import VirtualizedScrollView from "./VirtualizedScrollView";
+import { fontProps } from "./(tabs)";
 
 const ChatThreadScreen = () => {
   const { push } = useRouter();
@@ -27,7 +28,7 @@ const ChatThreadScreen = () => {
             overflow: "hidden",
           }}
         >
-          <Text style={{ color: "white", padding: 12 }}>{text}</Text>
+          <Text style={{ color: "white", padding: 12, ...fontProps }}>{text}</Text>
         </View>
       </TouchableOpacity>
     );
