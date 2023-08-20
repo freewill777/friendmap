@@ -34,7 +34,7 @@ const NewMediaScreen = () => {
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [imagePick, setImagePick] = useState<string | null>(null);
 
-  const { userId } = useContext(Heap);
+  const { userId, refreshData } = useContext(Heap);
 
   useEffect(() => {
     (async () => await Camera.requestCameraPermissionsAsync())();
@@ -75,6 +75,7 @@ const NewMediaScreen = () => {
       console.error('))-', error);
     } finally {
       setCameraPhoto(null);
+      refreshData()
     }
   };
 
@@ -100,6 +101,7 @@ const NewMediaScreen = () => {
       alert(error);
     } finally {
       setCameraVideo(null);
+      refreshData()
     }
   };
 

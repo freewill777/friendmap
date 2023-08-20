@@ -23,7 +23,7 @@ import { fontProps } from "./(tabs)";
 
 const NewStoryScreen = () => {
   const [showIcon, setShowIcon] = useState(true);
-  const { userId } = useContext(Heap);
+  const { userId, refreshData } = useContext(Heap);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -79,6 +79,7 @@ const NewStoryScreen = () => {
       alert(error);
     } finally {
       setCameraPhoto(null);
+      refreshData()
     }
   };
 
@@ -105,6 +106,7 @@ const NewStoryScreen = () => {
       alert(error);
     } finally {
       setCameraVideo(null);
+      refreshData()
     }
   };
 
