@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Dimensions,
   FlatList,
+  ScrollView,
 } from "react-native";
 import { Heap } from "./Heap";
 import { useContext, useEffect, useState, memo } from "react";
@@ -15,6 +16,7 @@ import { Video, ResizeMode } from "expo-av";
 import { Size } from "../constants/Sizes";
 import { Image } from 'expo-image';
 import { fontProps } from "./(tabs)";
+import { MediaElement } from "../components/MediaElement";
 
 export interface User {
   _id: string;
@@ -165,51 +167,26 @@ const VisitingProfile = () => {
         <Text style={styles.description}>{profileId ? visitingEmail : user}</Text>
       </View>
       <View style={styles.MainContainer}>
-        <View style={{ flex: 1, flexDirection: "column", margin: 1 }}>
-        </View>
-        {photosLength && userId ? (
-          <FlatList
-            data={totalItems}
-            renderItem={({ item }) =>
-              item.id < photosLength ? (
-                <View style={{ flex: 1, flexDirection: "column", margin: 1 }}>
-                  <Image
-                    style={{
-                      width: width / 3.0 - 16,
-                      height: height / 5.0,
-                      borderRadius: 8,
-                      margin: 8,
-                    }}
-                    source={{
-                      uri: `${host}/photo?userId=${profileId}&index=${item.id % photosLength
-                        }`,
-                    }}
-                  />
-                </View>
-              ) : (
-                <TouchableOpacity activeOpacity={0.8}>
-                  <Video
-                    source={{
-                      uri: `${host}/video?userId=${profileId}&index=${item.id}`,
-                    }}
-                    useNativeControls
-                    resizeMode={ResizeMode.CONTAIN}
-                    isLooping
-                    style={{
-                      width: width / 3.0 - 16,
-                      height: height / 5.0,
-                      borderRadius: 8,
-                      margin: 8,
-                    }}
-                  />
-                </TouchableOpacity>
-              )
-            }
-            numColumns={3}
-          />
-        ) : null}
+        {typeof profileId === 'string' && < ScrollView >
+          <MediaElement userId={profileId} elementIndex={0} />
+          <MediaElement userId={profileId} elementIndex={1} />
+          <MediaElement userId={profileId} elementIndex={2} />
+          <MediaElement userId={profileId} elementIndex={3} />
+          <MediaElement userId={profileId} elementIndex={4} />
+          <MediaElement userId={profileId} elementIndex={5} />
+          <MediaElement userId={profileId} elementIndex={6} />
+          <MediaElement userId={profileId} elementIndex={7} />
+          <MediaElement userId={profileId} elementIndex={8} />
+          <MediaElement userId={profileId} elementIndex={9} />
+          <MediaElement userId={profileId} elementIndex={10} />
+          <MediaElement userId={profileId} elementIndex={11} />
+          <MediaElement userId={profileId} elementIndex={12} />
+          <MediaElement userId={profileId} elementIndex={13} />
+          <MediaElement userId={profileId} elementIndex={14} />
+          <MediaElement userId={profileId} elementIndex={15} />
+        </ScrollView>}
       </View>
-    </View>
+    </View >
   );
 };
 

@@ -19,9 +19,11 @@ import { fontProps } from "./(tabs)";
 
 const NewEventScreen = () => {
   const [eventName, setEventName] = useState("");
+  const [submiting, setSubmiting] = useState(false);
   const [eventDate, setEventDate] = useState("");
   const [eventImage, setEventImage] = useState<string | null>(null);
   const { width } = Dimensions.get("window");
+  const { back } = useRouter();
 
   useEffect(() => {
     if (eventDate.length === 2 || eventDate.length === 5) {
@@ -30,11 +32,13 @@ const NewEventScreen = () => {
   }, [eventDate])
   const {
     userId,
+    refreshData
   } = useContext(Heap);
 
   const ready = Boolean(eventName) && Boolean(eventDate);
 
   const submitEvent = async () => {
+    setSubmiting(true)
     const formData = new FormData();
     if (eventImage) {
       formData.append("files", {
@@ -42,6 +46,8 @@ const NewEventScreen = () => {
         type: "image/jpeg",
         name: "event-photo.jpg",
       } as any);
+      refreshData()
+      back()
     }
 
     formData.append("userId", userId as string);

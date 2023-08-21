@@ -119,7 +119,7 @@ const Profile = () => {
   const currentDescription2 = currentUser !== null ? currentUser.stats.description2 : ""
 
   return (
-    <View style={{ flex: 1, marginHorizontal: Size }}>
+    <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <TouchableOpacity activeOpacity={0.7} onPress={pickAvatar}>
           <Image
@@ -173,7 +173,7 @@ const Profile = () => {
           <MediaElement userId={userId} elementIndex={15} />
         </ScrollView>}
       </View>
-    </View>
+    </View >
   );
 };
 
@@ -186,6 +186,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
     flexDirection: "row",
+    backgroundColor: '#f2f0f0'
   },
   containerCenter: {
     flex: 1,
@@ -216,6 +217,7 @@ const styles = StyleSheet.create({
   MainContainer: {
     justifyContent: "center",
     flex: 1,
+    paddingHorizontal: Size
   },
 
   imageThumbnail: {
