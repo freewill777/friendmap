@@ -12,7 +12,8 @@ import {
 } from "react-native";
 import { Image } from 'expo-image';
 import * as React from "react";
-import { Text, View } from "../../components/Themed";
+import { View } from "../../components/Themed";
+import { Text } from "../../components/Text";
 import { list, host } from "../../appData";
 import { useRouter, useNavigation } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
@@ -25,7 +26,11 @@ import VirtualizedScrollView from "../VirtualizedScrollView";
 import { Size } from "../../constants/Sizes";
 import { generateBoxShadowStyle } from "../../utils/generateBoxShadowStyle";
 
-export const fontProps: StyleProp<TextStyle> = { fontFamily: 'NeueHaasDisplayMediu', letterSpacing: 0, textTransform: 'capitalize' }
+export const fontProps: StyleProp<TextStyle> = {
+  fontFamily: 'RobotoMedium',
+  letterSpacing: 0,
+  textTransform: 'capitalize',
+}
 
 export const shadowProps = {
   shadowColor: "#000",
@@ -186,7 +191,9 @@ const StoriesThumbnails = () => {
               )}
             </View>
           </View>
-          <Text style={{ color: "#000", fontSize: 10, ...fontProps }}>{item.userName}</Text>
+          <Text style={{ color: "#000", fontSize: 9, ...fontProps }}>
+            {item.key !== 1 ? item.userName : 'Add Story'}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -257,8 +264,8 @@ const Feed = () => {
             }}
           />
           <View style={{ flexGrow: 2, backgroundColor: "#fff" }}>
-            <Text style={{ color: "#000", fontSize: 14, ...fontProps }}>{item.name}</Text>
-            <Text style={{ color: "#aaaaaa", ...fontProps }}>{item.date}</Text>
+            <Text style={{ color: "#000", ...fontProps }}>{item.name}</Text>
+            <Text style={{ color: "#aaaaaa", fontSize: 11, ...fontProps, lineHeight: 11 }}>{item.date}</Text>
           </View>
           <Dropdown label="Select Item" selectedEvent={selectedEvent} currentElement={item} data={dropdownMenuItems} onSelect={() => setSelectedEvent(item._id)} />
         </View>

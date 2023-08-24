@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from '@expo/vector-icons';
 
 // https://icons.expo.fyi/
-function TabBarIcon(props: {
+export function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
   size?: number

@@ -24,6 +24,12 @@ export default function RootLayout() {
     NeueHaasDisplayBold: require("../assets/fonts/NeueHaasDisplayBold.ttf"),
     NeueHaasDisplayMediu: require("../assets/fonts/NeueHaasDisplayMediu.ttf"),
     NeueHaasDisplayThin: require("../assets/fonts/NeueHaasDisplayThin.ttf"),
+    RobotoLight: require("../assets/fonts/Roboto-Light.ttf"),
+    RobotoMedium: require("../assets/fonts/Roboto-Medium.ttf"),
+    PoppinsMedium: require("../assets/fonts/Poppins-Medium.ttf"),
+    OpenSans: require("../assets/fonts/OpenSans-Variable.ttf"),
+    Rubik: require("../assets/fonts/Rubik-Variable.ttf"),
+    Mohave: require("../assets/fonts/Mohave.ttf"),
     ...FontAwesome.font,
   });
 
@@ -70,7 +76,7 @@ function RootLayoutNav() {
               key="login-screen"
               options={{
                 headerTitle: "",
-                // presentation: "modal",
+                presentation: "containedModal",
                 headerTransparent: true,
                 headerLeft: () => {
                   return (
@@ -86,7 +92,6 @@ function RootLayoutNav() {
               key="story-screen"
               options={{
                 headerTitle: "",
-                // presentation: "modal",
                 headerTransparent: true,
                 headerLeft: () => {
                   return (
@@ -114,7 +119,7 @@ function RootLayoutNav() {
             />
             <Stack.Screen
               name="register"
-              key="regsiter-screen"
+              key="register-screen"
               options={{
                 headerTitle: "",
                 headerTransparent: true,
@@ -131,12 +136,28 @@ function RootLayoutNav() {
               name="newevent"
               key="new-event-screen"
               options={{
+                presentation: "containedModal",
                 headerTitle: "",
                 headerTransparent: true,
                 headerLeft: () => {
                   return (
                     <TouchableOpacity onPress={back}>
                       <FontAwesome name="close" size={36} color="#696969" />
+                    </TouchableOpacity>
+                  );
+                },
+              }}
+            />
+            <Stack.Screen
+              name="event"
+              key="event-screen"
+              options={{
+                headerTitle: "",
+                headerTransparent: true,
+                headerLeft: () => {
+                  return (
+                    <TouchableOpacity onPress={back} style={{ backgroundColor: '#696969', borderRadius: 32, paddingVertical: 8, paddingHorizontal: 10, marginBottom: 10 }}>
+                      <FontAwesome name="close" size={24} color="#fff" />
                     </TouchableOpacity>
                   );
                 },
