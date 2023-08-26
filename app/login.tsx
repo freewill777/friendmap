@@ -70,9 +70,7 @@ const LoginScreen = () => {
         </View>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => push("/register")}>
-        <View>
-          <Text style={styles.link}>Create account</Text>
-        </View>
+        <Text style={styles.link}>Create account</Text>
       </TouchableOpacity>
     </View>
   );

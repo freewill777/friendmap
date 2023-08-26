@@ -10,11 +10,18 @@ import {
 import { texts, list } from "../../appData";
 import { useRouter } from "expo-router";
 import VirtualizedScrollView from "../VirtualizedScrollView";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Entypo } from '@expo/vector-icons';
 import { fontProps } from ".";
+import { Heap } from "../Heap";
 
 const GroupsScreen = () => {
+  const { setSearching } = useContext(Heap);
+
+  useEffect(() => {
+    setSearching(undefined)
+  }, [])
+
   const { push } = useRouter();
   const { width, height } = Dimensions.get("window");
 

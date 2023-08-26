@@ -11,6 +11,7 @@ import { useContext, useEffect } from "react";
 import { Touchable, TouchableOpacity, View, useColorScheme } from "react-native";
 export { ErrorBoundary } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { colors } from "./colors";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -154,6 +155,26 @@ function RootLayoutNav() {
               options={{
                 headerTitle: "",
                 headerTransparent: true,
+                headerLeft: () => {
+                  return (
+                    <TouchableOpacity onPress={back} style={{ backgroundColor: '#696969', borderRadius: 32, paddingVertical: 8, paddingHorizontal: 10, marginBottom: 10 }}>
+                      <FontAwesome name="close" size={24} color="#fff" />
+                    </TouchableOpacity>
+                  );
+                },
+              }}
+            />
+            <Stack.Screen
+              name="visitingprofile"
+              key="visiting-profile"
+              options={{
+                headerTitle: "",
+                headerTransparent: false,
+                headerBackground: () => {
+                  return (
+                    <View style={{ backgroundColor: colors.gray, height: 100 }} />
+                  );
+                },
                 headerLeft: () => {
                   return (
                     <TouchableOpacity onPress={back} style={{ backgroundColor: '#696969', borderRadius: 32, paddingVertical: 8, paddingHorizontal: 10, marginBottom: 10 }}>

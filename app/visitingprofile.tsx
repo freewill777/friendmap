@@ -1,5 +1,4 @@
 import {
-  Text,
   View,
   StyleSheet,
   TouchableOpacity,
@@ -7,6 +6,7 @@ import {
   FlatList,
   ScrollView,
 } from "react-native";
+import { Text as DefaultText } from "../components/Text";
 import { Heap } from "./Heap";
 import { useContext, useEffect, useState, memo } from "react";
 import { useRouter, usePathname, useSegments, useSearchParams } from "expo-router";
@@ -47,11 +47,10 @@ const VisitingProfile = () => {
   console.log({ profileId })
   const { width, height } = Dimensions.get("window");
 
-  useEffect(() => {
-    if (user === null) {
-      push("/login");
-    }
-  }, [user]);
+  const Text = (props: any) => {
+    const { style, ...otherProps } = props;
+    return <DefaultText style={[{ color: '#000' }]} {...otherProps} />
+  }
 
   useEffect(() => {
     refreshData()
@@ -60,9 +59,9 @@ const VisitingProfile = () => {
   if (user === null) {
     return (
       <View style={styles.containerCenter}>
-        <Text style={{ ...styles.title, marginTop: 100, marginBottom: 150 }}>
+        {/* <Text style={{ ...styles.title, marginTop: 100, marginBottom: 150 }}>
           Not authenticated
-        </Text>
+        </Text> */}
         <TouchableOpacity onPress={() => push("/login")}>
           <Text style={styles.link}>Login</Text>
         </TouchableOpacity>
@@ -160,8 +159,7 @@ const VisitingProfile = () => {
         </View>
       </View>
       <View style={{ marginBottom: 8 }}>
-        <Text style={styles.description}>{visitingDescription1}</Text>
-        <Text style={styles.description}>{visitingDescription2}</Text>
+        <Text style={styles.description}>{visitingDescription1}{visitingDescription2}</Text>
         <Text style={styles.description}></Text>
         <Text style={styles.description}>{profileId && visitingName}</Text>
         <Text style={styles.description}>{profileId ? visitingEmail : user}</Text>

@@ -21,7 +21,11 @@ import { Image } from 'expo-image';
 import { fontProps } from ".";
 
 const ChatScreen = () => {
-  const { userId, user } = useContext(Heap);
+  const { userId, user, setSearching } = useContext(Heap);
+
+  useEffect(() => {
+    setSearching(undefined)
+  }, [])
 
   socket.connect()
   const [inputText, setInputText] = useState("");
@@ -37,13 +41,6 @@ const ChatScreen = () => {
       socket.disconnect()
     }
   }, [])
-
-  useEffect(() => {
-    if (user === null) {
-      push("/login");
-    }
-  }, [user]);
-
 
   const { push } = useRouter();
   const { width } = Dimensions.get("window");
@@ -100,6 +97,19 @@ const ChatScreen = () => {
     );
   };
 
+  if (user === null) {
+    return (
+      <View style={styles.containerCenter}>
+        <TouchableOpacity onPress={() => push("/login")}>
+          <Text style={styles.link}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => push("/register")}>
+          <Text style={styles.link}>Create account</Text>
+        </TouchableOpacity>
+      </View >
+    );
+  }
+
   return (
     Boolean(user) ? <>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
@@ -135,6 +145,19 @@ const ChatScreen = () => {
 export default ChatScreen;
 
 const styles = StyleSheet.create({
+  containerCenter: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  link: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "#6AB3AC",
+    padding: 15,
+    ...fontProps
+  },
   button: {
     alignItems: 'center',
     justifyContent: 'center',

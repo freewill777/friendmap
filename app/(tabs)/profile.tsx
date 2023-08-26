@@ -36,20 +36,20 @@ const Profile = () => {
     refreshData()
   }, []);
 
-  useEffect(() => {
-    if (user === null) {
-      push("/login");
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user === null) {
+  //     push("/login");
+  //   }
+  // }, [user]);
 
 
 
   if (user === null) {
     return (
       <View style={styles.containerCenter}>
-        <Text style={{ ...styles.title, marginTop: 100, ...fontProps }}>
+        {/* <Text style={{ ...styles.title, marginTop: 100, ...fontProps }}>
           Not authenticated
-        </Text>
+        </Text> */}
         <TouchableOpacity onPress={() => push("/login")}>
           <Text style={styles.link}>Login</Text>
         </TouchableOpacity>

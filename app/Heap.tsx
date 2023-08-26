@@ -2,7 +2,7 @@ import { ReactNode, createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { host } from "../appData";
 
-type Data = {
+export type Data = {
   user: string | "";
   setUser: React.Dispatch<React.SetStateAction<string>>;
   save?: (value: string) => Promise<"" | undefined>;
@@ -15,11 +15,15 @@ type Data = {
   setProfileImage: React.Dispatch<React.SetStateAction<string | null>>;
   setPhotosLength: React.Dispatch<React.SetStateAction<string | null>>;
   setVideosLength: React.Dispatch<React.SetStateAction<string | null>>;
+  searching: "users" | "events" | "groups" | "messages" | undefined
+  setSearching: any;
   items: any;
   itemsVideo: any;
   photosLength: any;
   videosLength: any;
-  refreshData: () => void
+  refreshData: () => void;
+  searchText: string | undefined,
+  setSearchText: (text: string) => void;
 };
 
 class UserStorage {
@@ -56,6 +60,8 @@ const HeapProvider = (props: { children: ReactNode }) => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [photosLength, setPhotosLength] = useState<string | null>(null);
   const [videosLength, setVideosLength] = useState<string | null>(null);
+  const [searching, setSearching] = useState(undefined)
+  const [searchText, setSearchText] = useState<string | undefined>(undefined)
 
   const getPhotos = async () => {
     try {
@@ -134,7 +140,11 @@ const HeapProvider = (props: { children: ReactNode }) => {
     setPhotosLength,
     photosLength,
     videosLength,
-    refreshData
+    refreshData,
+    searching,
+    setSearching,
+    searchText,
+    setSearchText
   };
 
   return <Heap.Provider value={data}>{props.children}</Heap.Provider>;

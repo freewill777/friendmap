@@ -1,13 +1,14 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs, useRouter } from "expo-router";
-import { Pressable, StyleSheet, Image, View, Text, TextInput, Button, TouchableWithoutFeedback } from "react-native";
-import { Heap } from "../Heap";
+import { Pressable, StyleSheet, Image, View, Text, TextInput, Button, TouchableWithoutFeedback, Dimensions } from "react-native";
+import { Data, Heap } from "../Heap";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { logo } from "../../appData";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from '@expo/vector-icons';
+import { fontProps } from ".";
 
 // https://icons.expo.fyi/
 export function TabBarIcon(props: {
@@ -18,89 +19,130 @@ export function TabBarIcon(props: {
   return <FontAwesome size={!!props.size ? props.size : 28} {...props} />;
 }
 
-export default function TabLayout() {
-  const { user, setUser } = useContext(Heap);
+const SearchBar = ({
+  searchText,
+  setSearchText,
+  setSearching,
+  searching
+}: Partial<Data>) => {
+  const inputRef = useRef<TextInput>(null);
+  return (<View style={{ flexDirection: "row", alignItems: 'center', }}>
+    <Pressable onPress={() => {
+      setSearching(undefined);
+      setSearchText && setSearchText("");
+    }}>
+      <FontAwesome
+        name="times-circle"
+        size={30}
+        style={{ marginRight: 11, color: '#454545' }}
+      />
+    </Pressable>
+    <TextInput
+      value={searchText}
+      onChangeText={(text) => setSearchText && setSearchText(text)}
+      placeholder={"Search " + searching}
+      placeholderTextColor={"#454545"}
+      style={{ ...styles.input }}
+      ref={inputRef}
+    />
+  </View>)
+}
+
+const HeaderButtonsBar = ({ setSearching }: any) => {
   const { push } = useRouter();
+  return (<>
+    <Pressable onPress={() => push("newevent")}>
+      {({ pressed }) => (
+        <MaterialIcons name="addchart"
+          size={24}
+          color="#696969"
+          style={{
+            marginRight: 15,
+            marginTop: 1,
+            opacity: pressed ? 0.5 : 1,
+          }}
+        />
+      )}
+    </Pressable>
+    <Pressable onPress={() => push("notifications")}>
+      {({ pressed }) => (
+        <Ionicons
+          name="ios-notifications-circle-outline"
+          size={28}
+          color="#696969"
+          style={{
+            marginRight: 15,
+            marginTop: 1,
+            opacity: pressed ? 0.5 : 1,
+          }}
+        />
+      )}
+    </Pressable>
+    <Pressable onPress={() => push("chat")}>
+      {({ pressed }) => (
+        <Ionicons
+          name="ios-chatbubble-outline"
+          size={24}
+          color="#696969"
+          style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+        />
+      )}
+    </Pressable>
+    <Pressable>
+      {({ pressed }) => (
+        <Ionicons
+          name="search"
+          size={24}
+          color="#696969"
+          style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+          onPress={() => setSearching("users")}
+        />
+      )}
+    </Pressable>
+  </>)
+}
+
+const HeaderToolbar = ({ searching,
+  searchText,
+  setSearching,
+  setSearchText
+}: Partial<Data> & {
+  searching: string | undefined
+}) => {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      {searching ? (
+        <SearchBar
+          searchText={searchText}
+          setSearchText={setSearchText}
+          setSearching={setSearching}
+          searching={searching}
+        />
+      ) : (
+        <HeaderButtonsBar
+          setSearching={setSearching}
+        />
+      )}
+    </View>
+  )
+}
+
+
+export default function TabLayout() {
+  const {
+    user,
+    setUser,
+    searching,
+    setSearching,
+    setSearchText,
+    searchText
+  } = useContext(Heap);
 
   const logout = async () => {
     await AsyncStorage.setItem("@name", "");
     setUser("");
   };
 
-  const [searchText, setSearchText] = useState('')
-  const [searching, setSearching] = useState(false)
-
-  const HeaderToolbar = () => {
-    return (
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        {searching ? <>
-          <Pressable onPress={() => setSearching(false)}>
-            <FontAwesome
-              name="window-close"
-              size={32}
-              color="black"
-              style={{ marginRight: 10, color: 'grey' }}
-            />
-
-          </Pressable>
-          <TextInput
-            value={searchText}
-            onChangeText={(text) => setSearchText(text)}
-            placeholder={"Username"}
-            style={styles.input}
-          />
-        </> : <><Pressable onPress={() => push("newevent")}>
-          {({ pressed }) => (
-            <MaterialIcons name="addchart"
-              size={24}
-              color="#696969"
-              style={{
-                marginRight: 15,
-                marginTop: 1,
-                opacity: pressed ? 0.5 : 1,
-              }}
-            />
-          )}
-        </Pressable>
-          <Pressable onPress={() => push("notifications")}>
-            {({ pressed }) => (
-              <Ionicons
-                name="ios-notifications-circle-outline"
-                size={28}
-                color="#696969"
-                style={{
-                  marginRight: 15,
-                  marginTop: 1,
-                  opacity: pressed ? 0.5 : 1,
-                }}
-              />
-            )}
-          </Pressable>
-          <Pressable onPress={() => push("chat")}>
-            {({ pressed }) => (
-              <Ionicons
-                name="ios-chatbubble-outline"
-                size={24}
-                color="#696969"
-                style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-              />
-            )}
-          </Pressable>
-          {/* <Pressable>
-            {({ pressed }) => (
-              <Ionicons
-                name="search"
-                size={24}
-                color="#696969"
-                style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                onPress={() => setSearching(true)}
-              />
-            )}
-          </Pressable> */}
-        </>}
-      </View>
-    )
-  }
   return (
     <Tabs
       screenOptions={{
@@ -115,12 +157,16 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           tabBarLabelStyle: { display: "none" },
           headerLeft: () => (
-            <Image
+            !searching ? <Image
               source={logo}
               style={{ width: 72, height: 72, marginLeft: 5 }}
-            />
+            /> : null
           ),
-          headerRight: () => <HeaderToolbar />,
+          headerRight: () => <HeaderToolbar
+            searching={searching}
+            setSearchText={setSearchText}
+            setSearching={setSearching}
+          />,
           unmountOnBlur: true,
         }}
       />
@@ -132,7 +178,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="group" color={color} />,
           tabBarLabelStyle: { display: "none" },
           unmountOnBlur: true,
-          headerRight: () => <HeaderToolbar />
+          headerRight: () => <HeaderToolbar searching={searching}
+            setSearchText={setSearchText}
+            setSearching={setSearching} />
         }}
       />
       <Tabs.Screen
@@ -157,7 +205,11 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="wechat" color={color} />,
           tabBarLabelStyle: { display: "none" },
           unmountOnBlur: true,
-          headerRight: () => <HeaderToolbar />
+          headerRight: () => <HeaderToolbar
+            searching={searching}
+            setSearchText={setSearchText}
+            setSearching={setSearching}
+          />
         }}
       />
 
@@ -190,6 +242,7 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
 const styles = StyleSheet.create({
   title: {
     fontSize: 25,
@@ -197,11 +250,13 @@ const styles = StyleSheet.create({
     color: "#6AB3AC",
   },
   input: {
-    width: 220,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: "grey",
+    paddingHorizontal: 10,
     borderRadius: 3,
-    marginRight: 20
+    width: Dimensions.get("window").width / 1.2,
+    marginRight: 10,
+    height: 30,
+    backgroundColor: "#F0F0F0",
+    color: "black",
+    fontFamily: "NeueHaasDisplayThin",
   },
 });

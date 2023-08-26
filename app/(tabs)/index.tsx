@@ -6,9 +6,6 @@ import {
   Dimensions,
   TouchableOpacity,
   Modal,
-  StyleProp,
-  TextStyle,
-  Platform,
 } from "react-native";
 import { Image } from 'expo-image';
 import * as React from "react";
@@ -16,7 +13,7 @@ import { View } from "../../components/Themed";
 import { Text } from "../../components/Text";
 import { list, host } from "../../appData";
 import { useRouter, useNavigation } from "expo-router";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { Heap } from "../Heap";
@@ -26,7 +23,7 @@ import VirtualizedScrollView from "../VirtualizedScrollView";
 import { Size } from "../../constants/Sizes";
 import { generateBoxShadowStyle } from "../../utils/generateBoxShadowStyle";
 
-export const fontProps: StyleProp<TextStyle> = {
+export const fontProps: any = {
   fontFamily: 'RobotoMedium',
   letterSpacing: 0,
   textTransform: 'capitalize',
@@ -345,6 +342,327 @@ const Feed = () => {
 };
 
 export default function TabOneScreen() {
+  const { push } = useRouter();
+
+  const { searching, setSearching } = React.useContext(Heap);
+  const navigation = useNavigation();
+
+  React.useEffect(() => {
+    setSearching(undefined)
+  }, [])
+
+  const renderItemUser = ({ item, index }: any) => {
+    return (
+      <TouchableOpacity
+        onPress={() => push({
+          params: { profileId: item._id },
+          pathname: '/visitingprofile'
+        })}
+        key={index}
+      >
+        <View
+          style={{
+            backgroundColor: colors.gray,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={{ uri: `${host}/avatar?userId=${item._id}` }}
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 64,
+              margin: Size,
+            }}
+          />
+          <View style={{ backgroundColor: colors.gray }}>
+            <Text style={{ color: "#000", ...fontProps as any }}>{item.name}</Text>
+            <Text style={{ color: "#aaaaaa", fontSize: 11, ...fontProps, lineHeight: 11 }}>{item.email}</Text>
+          </View>
+        </View>
+      </TouchableOpacity >
+    );
+  };
+
+  const renderItemEvent = ({ item, index }: any) => {
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate("event", { id: item._id })}
+        key={index}
+      >
+        <View
+          style={{
+            backgroundColor: colors.gray,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={{ uri: `${host}/event-media?eventId=${item._id}` }}
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 64,
+              margin: Size,
+            }}
+          />
+          <View style={{ backgroundColor: colors.gray }}>
+            <Text style={{ color: "#000", ...fontProps as any }}>{item.name}</Text>
+            <Text style={{ color: "#aaaaaa", fontSize: 11, ...fontProps, lineHeight: 11 }}>{item.date}</Text>
+          </View>
+        </View>
+      </TouchableOpacity >
+    );
+  };
+
+  const renderChip = ({ item, index }: any) => {
+    return (
+      <TouchableOpacity
+        onPress={() => setSearching(item.name)}
+        key={index}
+      >
+        <View
+          style={{
+            backgroundColor: colors.gray,
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            marginRight: 8
+          }}
+        >
+          <View style={{ backgroundColor: searching === item.name ? colors.darkergray : colors.darkgray, borderRadius: 30, padding: 10 }}>
+            <Text style={{ color: colors.white, fontSize: 12, ...fontProps, }}>{item.name}</Text>
+          </View>
+        </View>
+      </TouchableOpacity >
+    );
+  };
+
+  const SearchBodyUsers = () => {
+    const { searching, searchText } = React.useContext(Heap);
+
+    const [users, setUsers] = React.useState([])
+    const [events, setEvents] = React.useState([])
+    const [text] = React.useState(searchText)
+
+    React.useEffect(() => {
+      (async () => {
+        const response = await fetch(`${host}/users`)
+        const responseData = await response.json();
+        setUsers(responseData)
+      })()
+    }, []);
+
+    return <>
+      <SafeAreaView>
+        <VirtualizedScrollView>
+          <View style={{ backgroundColor: colors.gray, marginVertical: 10 }}>
+            <ScrollView
+              horizontal
+              style={{
+                width: Dimensions.get("window").width,
+                paddingStart: Size,
+                marginVertical: Size / 2
+              }}
+            >
+              <SafeAreaView>
+                <FlatList
+                  data={[
+                    { _id: "1", name: 'users' },
+                    { _id: "2", name: 'groups' },
+                    { _id: "3", name: 'events' },
+                  ]}
+                  renderItem={renderChip}
+                  numColumns={list.length}
+                  ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
+                />
+              </SafeAreaView>
+            </ScrollView>
+          </View>
+        </VirtualizedScrollView>
+      </SafeAreaView>
+      <SafeAreaView>
+        <VirtualizedScrollView>
+          <View style={{ backgroundColor: colors.gray, }}>
+            <ScrollView
+              style={{
+                width: Dimensions.get("window").width,
+                paddingStart: Size,
+                marginVertical: Size / 2
+              }}
+            >
+              <SafeAreaView>
+                <FlatList
+                  data={[...users].filter((user) => {
+                    return !!searchText && user?.name?.toLowerCase().includes(searchText?.toLowerCase())
+                  })}
+                  renderItem={renderItemUser}
+                  ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
+                />
+              </SafeAreaView>
+            </ScrollView>
+          </View>
+        </VirtualizedScrollView>
+      </SafeAreaView>
+    </>
+  }
+
+  const SearchBodyEvents = () => {
+    const { width } = Dimensions.get('window')
+
+    const { searching } = React.useContext(Heap);
+
+    const [users, setUsers] = React.useState([])
+    const [events, setEvents] = React.useState([])
+
+    React.useEffect(() => {
+      (async () => {
+        const response = await fetch(`${host}/events`)
+        const responseData = await response.json();
+        setEvents(responseData)
+      })()
+    }, []);
+
+    return <>
+      <SafeAreaView>
+        <VirtualizedScrollView>
+          <View
+            style={{
+              backgroundColor: colors.gray,
+              marginVertical: 10
+            }}
+          >
+            <ScrollView
+              horizontal
+              style={{
+                width,
+                paddingStart: Size,
+                marginVertical: Size / 2
+              }}
+            >
+              <SafeAreaView>
+                <FlatList
+                  data={[
+                    { _id: "1", name: 'users' },
+                    { _id: "2", name: 'groups' },
+                    { _id: "3", name: 'events' },
+                  ]}
+                  renderItem={renderChip}
+                  numColumns={list.length}
+                  ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
+                />
+              </SafeAreaView>
+            </ScrollView>
+          </View>
+        </VirtualizedScrollView>
+      </SafeAreaView>
+      <SafeAreaView>
+        <VirtualizedScrollView>
+          <View style={{ backgroundColor: colors.gray, }}>
+            <ScrollView
+              style={{
+                width,
+                paddingStart: Size,
+                marginVertical: Size / 2
+              }}
+            >
+              <SafeAreaView>
+                <FlatList
+                  data={[...events]}
+                  renderItem={renderItemEvent}
+                  ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
+                />
+              </SafeAreaView>
+            </ScrollView>
+          </View>
+        </VirtualizedScrollView>
+      </SafeAreaView>
+    </>
+  }
+
+  const SearchBodyGroups = () => {
+    const { searching } = React.useContext(Heap);
+
+    const [users, setUsers] = React.useState([])
+    const [events, setEvents] = React.useState([])
+
+    const { width } = Dimensions.get('window')
+
+    React.useEffect(() => {
+      (async () => {
+        const response = await fetch(`${host}/groups`)
+        const responseData = await response.json();
+        setUsers(responseData)
+      })()
+    }, []);
+
+    return <>
+      <SafeAreaView>
+        <VirtualizedScrollView>
+          <View style={{ backgroundColor: colors.gray, marginVertical: 10 }}>
+            <ScrollView
+              horizontal
+              style={{
+                width,
+                paddingStart: Size,
+                marginVertical: Size / 2
+              }}
+            >
+              <SafeAreaView>
+                <FlatList
+                  data={[
+                    { _id: "1", name: 'users' },
+                    { _id: "2", name: 'groups' },
+                    { _id: "3", name: 'events' },
+                  ]}
+                  renderItem={renderChip}
+                  numColumns={list.length}
+                  ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
+                />
+              </SafeAreaView>
+            </ScrollView>
+          </View>
+        </VirtualizedScrollView>
+      </SafeAreaView>
+      <SafeAreaView>
+        <VirtualizedScrollView>
+          <View style={{ backgroundColor: colors.gray, }}>
+            <ScrollView
+              style={{
+                width,
+                paddingStart: Size,
+                marginVertical: Size / 2
+              }}
+            >
+              <SafeAreaView>
+                <FlatList
+                  data={[...users]}
+                  renderItem={renderItemUser}
+                  ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
+                />
+              </SafeAreaView>
+            </ScrollView>
+          </View>
+        </VirtualizedScrollView>
+      </SafeAreaView>
+    </>
+  }
+
+  if (searching === 'users') {
+    return <SearchBodyUsers />
+  }
+
+  if (searching === 'events') {
+    return <SearchBodyEvents />
+  }
+
+  if (searching === 'groups') {
+    return <SearchBodyGroups />
+  }
+
   return (
     <SafeAreaView>
       <VirtualizedScrollView>
