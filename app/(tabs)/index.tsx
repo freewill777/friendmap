@@ -442,11 +442,9 @@ export default function TabOneScreen() {
   };
 
   const SearchBodyUsers = () => {
-    const { searching, searchText } = React.useContext(Heap);
+    const { searchText } = React.useContext(Heap);
 
     const [users, setUsers] = React.useState([])
-    const [events, setEvents] = React.useState([])
-    const [text] = React.useState(searchText)
 
     React.useEffect(() => {
       (async () => {
@@ -495,13 +493,15 @@ export default function TabOneScreen() {
               }}
             >
               <SafeAreaView>
-                <FlatList
-                  data={[...users].filter((user) => {
-                    return !!searchText && user?.name?.toLowerCase().includes(searchText?.toLowerCase())
+                {searchText && <FlatList
+                  data={[...users].filter((item: { name: string }) => {
+                    const isMatch = item?.name?.toLowerCase()
+                      .includes(searchText.toLowerCase())
+                    return !!searchText && isMatch
                   })}
                   renderItem={renderItemUser}
                   ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
-                />
+                />}
               </SafeAreaView>
             </ScrollView>
           </View>
@@ -513,9 +513,8 @@ export default function TabOneScreen() {
   const SearchBodyEvents = () => {
     const { width } = Dimensions.get('window')
 
-    const { searching } = React.useContext(Heap);
+    const { searchText } = React.useContext(Heap);
 
-    const [users, setUsers] = React.useState([])
     const [events, setEvents] = React.useState([])
 
     React.useEffect(() => {
@@ -570,11 +569,15 @@ export default function TabOneScreen() {
               }}
             >
               <SafeAreaView>
-                <FlatList
-                  data={[...events]}
+                {searchText && <FlatList
+                  data={[...events].filter((item: { name: string }) => {
+                    const isMatch = item?.name?.toLowerCase()
+                      .includes(searchText.toLowerCase())
+                    return !!searchText && isMatch
+                  })}
                   renderItem={renderItemEvent}
                   ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
-                />
+                />}
               </SafeAreaView>
             </ScrollView>
           </View>
@@ -584,10 +587,9 @@ export default function TabOneScreen() {
   }
 
   const SearchBodyGroups = () => {
-    const { searching } = React.useContext(Heap);
+    const { searchText } = React.useContext(Heap);
 
     const [users, setUsers] = React.useState([])
-    const [events, setEvents] = React.useState([])
 
     const { width } = Dimensions.get('window')
 
@@ -638,11 +640,15 @@ export default function TabOneScreen() {
               }}
             >
               <SafeAreaView>
-                <FlatList
-                  data={[...users]}
+                {searchText && <FlatList
+                  data={[...users].filter((item: { name: string }) => {
+                    const isMatch = item?.name?.toLowerCase()
+                      .includes(searchText.toLowerCase())
+                    return !!searchText && isMatch
+                  })}
                   renderItem={renderItemUser}
                   ItemSeparatorComponent={() => <View style={{ marginVertical: 4 }} />}
-                />
+                />}
               </SafeAreaView>
             </ScrollView>
           </View>
