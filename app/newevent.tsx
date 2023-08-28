@@ -30,6 +30,7 @@ const NewEventScreen = () => {
       setEventDate((eventDate) => eventDate + '-')
     }
   }, [eventDate])
+
   const {
     userId,
     refreshData
@@ -53,6 +54,7 @@ const NewEventScreen = () => {
     formData.append("userId", userId as string);
     formData.append("eventDate", eventDate);
     formData.append("eventName", eventName);
+
     const eventId = objectId()
 
     try {
@@ -108,6 +110,7 @@ const NewEventScreen = () => {
       await submitEvent();
       // push("profile")
     }
+    refreshData()
   }
 
   const pickPhoto = async () => {
@@ -128,7 +131,11 @@ const NewEventScreen = () => {
       <TouchableOpacity activeOpacity={0.7} onPress={pickPhoto}>
         <Image
           source={eventImage ? eventImage : logo}
-          style={{ minWidth: width, minHeight: 300 }}
+          style={{
+            minWidth: width,
+            minHeight: 300,
+            marginBottom: 30,
+          }}
         />
       </TouchableOpacity>
       <TextInput

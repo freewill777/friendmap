@@ -589,7 +589,7 @@ export default function TabOneScreen() {
   const SearchBodyGroups = () => {
     const { searchText } = React.useContext(Heap);
 
-    const [users, setUsers] = React.useState([])
+    const [groups, setGroups] = React.useState([])
 
     const { width } = Dimensions.get('window')
 
@@ -597,7 +597,7 @@ export default function TabOneScreen() {
       (async () => {
         const response = await fetch(`${host}/groups`)
         const responseData = await response.json();
-        setUsers(responseData)
+        setGroups(responseData)
       })()
     }, []);
 
@@ -641,7 +641,7 @@ export default function TabOneScreen() {
             >
               <SafeAreaView>
                 {searchText && <FlatList
-                  data={[...users].filter((item: { name: string }) => {
+                  data={[...groups].filter((item: { name: string }) => {
                     const isMatch = item?.name?.toLowerCase()
                       .includes(searchText.toLowerCase())
                     return !!searchText && isMatch
