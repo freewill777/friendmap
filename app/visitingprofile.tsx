@@ -17,6 +17,7 @@ import { Size } from "../constants/Sizes";
 import { Image } from 'expo-image';
 import { fontProps } from "./(tabs)";
 import { MediaElement } from "../components/MediaElement";
+import { fontFamily, spaceyButton } from "./event";
 
 export interface User {
   _id: string;
@@ -25,6 +26,8 @@ export interface User {
   stats: {
     description1: string;
     description2: string;
+    pendingFriends: Array<Pick<User, "_id">>;
+    friends: Array<Pick<User, "_id">>;
   }
 }
 
@@ -36,7 +39,6 @@ const VisitingProfile = () => {
     setProfileImage,
     items,
     itemsVideo,
-    photosLength,
     refreshData
   } = useContext(Heap);
 
@@ -44,8 +46,7 @@ const VisitingProfile = () => {
 
   const { profileId } = useSearchParams();
 
-  console.log({ profileId })
-  const { width, height } = Dimensions.get("window");
+  const { width } = Dimensions.get("window");
 
   const Text = (props: any) => {
     const { style, ...otherProps } = props;
@@ -56,12 +57,28 @@ const VisitingProfile = () => {
     refreshData()
   }, []);
 
+  const [visitingUser, setVisitingUser] = useState<User | null>(null);
+
+  const requestAlreadySent = visitingUser?.stats.pendingFriends?.some(friend => friend?._id === userId)
+  const isFriend = visitingUser?.stats.friends?.some(friend => friend?._id === userId)
+
+  const getData = async () => {
+    const response = await fetch(`${host}/user?id=${profileId}`);
+    if (response.ok) {
+      const userData = await response.json();
+      setVisitingUser(userData);
+    } else {
+      console.error("Failed to fetch user data");
+    }
+  }
+
+  useEffect(() => {
+    getData()
+  }, []);
+
   if (user === null) {
     return (
       <View style={styles.containerCenter}>
-        {/* <Text style={{ ...styles.title, marginTop: 100, marginBottom: 150 }}>
-          Not authenticated
-        </Text> */}
         <TouchableOpacity onPress={() => push("/login")}>
           <Text style={styles.link}>Login</Text>
         </TouchableOpacity>
@@ -106,30 +123,17 @@ const VisitingProfile = () => {
 
   const totalItems = [...items, ...itemsVideo];
 
-  const [visitingUser, setVisitingUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${host}/user?id=${profileId}`);
-        if (response.ok) {
-          const userData = await response.json();
-          setVisitingUser(userData);
-        } else {
-          console.log("Failed to fetch user data");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, []);
-  console.log('visitingUser', visitingUser)
   const visitingEmail = visitingUser !== null ? visitingUser.email : ""
   const visitingName = visitingUser !== null ? visitingUser.name : ""
   const visitingDescription1 = visitingUser !== null ? visitingUser.stats.description1 : ""
   const visitingDescription2 = visitingUser !== null ? visitingUser.stats.description2 : ""
+
+  const handleAddFriend = async () => {
+    const url = `${host}/friend-request?senderUserId=${userId}&recvUserId=${profileId}`
+    await fetch(url, { method: 'POST' })
+    getData()
+  }
+
   return (
     <View style={{ flex: 1, marginHorizontal: Size }}>
       <View style={styles.container}>
@@ -149,13 +153,22 @@ const VisitingProfile = () => {
             <Text style={styles.statsItemKey}>posts</Text>
           </View>
           <View style={{ marginRight: 5 }}>
-            <Text style={styles.statsItemValue}>446</Text>
-            <Text style={styles.statsItemKey}>followers</Text>
+            <Text style={styles.statsItemValue}>{visitingUser?.stats?.friends?.length || "0"}</Text>
+            <Text style={styles.statsItemKey}>Friends</Text>
           </View>
-          <View>
-            <Text style={styles.statsItemValue}>444</Text>
-            <Text style={styles.statsItemKey}>following</Text>
-          </View>
+          <TouchableOpacity onPress={handleAddFriend}
+            style={{
+              ...spaceyButton,
+              borderColor: '#000',
+              backgroundColor: false ? '#fff' : "transparent",
+              alignSelf: 'center',
+            }}
+          >
+            {!isFriend && <Text style={{ color: true ? '#6AB3A0' : '#fff', fontFamily }}>
+              {requestAlreadySent ? "Request sent" : "Add friend"}
+            </Text>}
+            {isFriend && <Text style={{ color: true ? '#6AB3A0' : '#fff', fontFamily }}>Friends</Text>}
+          </TouchableOpacity>
         </View>
       </View>
       <View style={{ marginBottom: 8 }}>

@@ -10,17 +10,24 @@ import {
 import { texts } from "../appData";
 import { useRouter } from "expo-router";
 import VirtualizedScrollView from "./VirtualizedScrollView";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Entypo } from '@expo/vector-icons';
 import { fontProps } from "./(tabs)";
+import { Heap } from "./Heap";
 
 const NotificationsScreen = () => {
   const { push } = useRouter();
   const { width, height } = Dimensions.get("window");
 
+  const {
+    userId
+  } = useContext(Heap);
+
   const [items] = useState([]);
+
   const renderItem = ({ item }: any) => {
     const text = texts[item.key - 1];
+
     return (
       <TouchableOpacity onPress={() => push("event")}>
         <View

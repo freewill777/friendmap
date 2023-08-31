@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { View, StyleSheet, Dimensions, Text, Button, TouchableOpacity } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { Image } from 'expo-image';
@@ -8,13 +8,14 @@ import { fontProps } from "./(tabs)";
 import { colors } from "./colors";
 import { TabBarIcon } from "./(tabs)/_layout";
 import { AntDesign } from "@expo/vector-icons";
+import { Heap } from "./Heap";
 
-const fontFamily = 'NeueHaasDisplayBold';
+export const fontFamily = 'NeueHaasDisplayBold';
 
-const ButtonIcon = ({ text, iconName, iconStyle }: { text: string, iconName: string, iconStyle?: object }) => {
+const ButtonIcon = ({ text, iconName, iconStyle, inversed }: { text: string, iconName: string, iconStyle?: object, inversed?: boolean }) => {
   const iconSize = 22
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15, }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
       <View style={{
         backgroundColor: 'white',
         borderRadius: 56,
@@ -31,47 +32,73 @@ const ButtonIcon = ({ text, iconName, iconStyle }: { text: string, iconName: str
           style={{ marginRight: -1 }}
         />
       </View>
-      <Text style={{ color: '#fff', marginLeft: 5, fontFamily }}>{text}</Text>
+      <Text style={{ color: inversed ? '#6AB3A0' : '#fff', marginLeft: 5, fontFamily }}>{text}</Text>
     </View>
   )
 }
 
-const spaceyButton = {
+export const spaceyButton = {
   borderWidth: 1,
   borderColor: '#fff',
   paddingHorizontal: 8,
-  paddingVertical: 8,
-  marginRight: 8,
-  borderRadius: 4
+  paddingVertical: 3,
+  marginHorizontal: 8,
+  borderRadius: 4,
 }
 
+type EventDetails = {
+  name: string,
+  date: string,
+  going: string[],
+  interested: string[],
+}
 const EventScreen = () => {
   const route = useRoute();
   const { params } = route;
   const { id } = params as any;
-  const [eventDetails, setEventDetails] = useState<"" | { name: string, date: string }>("");
+  const { userId } = useContext(Heap)
+  const [eventDetails, setEventDetails] = useState<EventDetails | undefined>(undefined);
+
+  const goingItems = eventDetails?.going?.length || 0
+  const interestedItems = eventDetails?.interested?.length || 0
+
+  const interested = userId ? eventDetails?.interested?.includes(userId) : false
+  const going = userId ? eventDetails?.going?.includes(userId) : false
 
   const { width, height } = Dimensions.get("window");
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch(`${host}/event?id=${id}`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const json = await response.json();
-        setEventDetails(json);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+  const getData = async () => {
+    try {
+      const response = await fetch(`${host}/event?id=${id}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    })();
+      const json = await response.json();
+      setEventDetails(json);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+
+  useEffect(() => {
+    getData();
   }, []);
 
   const primaryColor = colors.primary;
   const primaryRGB = hexToRGB(primaryColor);
   const iconName = "star"
   const iconSize = 28
+
+  const handleInterested = async () => {
+    await fetch(`${host}/event-interested?userId=${userId}&eventId=${id}`)
+    getData()
+  }
+
+  const handleGoing = async () => {
+    await fetch(`${host}/event-going?userId=${userId}&eventId=${id}`);
+    getData()
+  }
+
   return (
     <View style={styles.container}>
       <Image
@@ -106,11 +133,11 @@ const EventScreen = () => {
 
           </View>
           <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
-            <TouchableOpacity onPress={() => { }} style={{ ...spaceyButton }}>
-              <ButtonIcon text="Interested" iconName="star" />
+            <TouchableOpacity onPress={handleInterested} style={{ ...spaceyButton, backgroundColor: interested ? '#fff' : "transparent" }}>
+              <ButtonIcon text="Interested" iconName="star" inversed={interested} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { }} style={{ ...spaceyButton }}>
-              <ButtonIcon text="Going" iconName="login" iconStyle={{ paddingTop: 1 }} />
+            <TouchableOpacity onPress={handleGoing} style={{ ...spaceyButton, backgroundColor: going ? '#fff' : "transparent" }}>
+              <ButtonIcon text="Going" iconName="login" iconStyle={{ paddingTop: 1 }} inversed={going} />
             </TouchableOpacity>
           </View>
         </View>
@@ -182,7 +209,7 @@ const EventScreen = () => {
               style={{ marginRight: -1 }}
             />
           </View>
-          <Text style={{ color: '#354a45', marginLeft: 5, fontFamily }}>200 going - 433 interested</Text>
+          <Text style={{ color: '#354a45', marginLeft: 5, fontFamily }}>{goingItems} going - {interestedItems} interested</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15, }}>
           <View style={{

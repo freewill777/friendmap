@@ -1,5 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs, useRouter } from "expo-router";
+import { Tabs, useNavigation, useRouter } from "expo-router";
 import { Pressable, StyleSheet, Image, View, Text, TextInput, Button, TouchableWithoutFeedback, Dimensions } from "react-native";
 import { Data, Heap } from "../Heap";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -50,6 +50,10 @@ const SearchBar = ({
 
 const HeaderButtonsBar = ({ setSearching }: any) => {
   const { push } = useRouter();
+  const navigation = useNavigation();
+  const {
+    userId
+  } = useContext(Heap);
   return (<>
     <Pressable onPress={() => push("newevent")}>
       {({ pressed }) => (
@@ -64,7 +68,7 @@ const HeaderButtonsBar = ({ setSearching }: any) => {
         />
       )}
     </Pressable>
-    <Pressable onPress={() => push("notifications")}>
+    <Pressable onPress={() => navigation.navigate("notifications", { id: userId })}>
       {({ pressed }) => (
         <Ionicons
           name="ios-notifications-circle-outline"
@@ -135,7 +139,6 @@ export default function TabLayout() {
     searching,
     setSearching,
     setSearchText,
-    searchText
   } = useContext(Heap);
 
   const logout = async () => {

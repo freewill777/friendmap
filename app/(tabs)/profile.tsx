@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Heap } from "../Heap";
 import { useContext, useEffect, useState } from "react";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { host } from "../../appData";
 import * as ImagePicker from "expo-image-picker";
 import { Size } from "../../constants/Sizes";
@@ -31,25 +31,32 @@ const Profile = () => {
   const { push } = useRouter();
 
   const { width } = Dimensions.get("window");
+  const { navigate } = useNavigation()
+
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
     refreshData()
   }, []);
 
-  // useEffect(() => {
-  //   if (user === null) {
-  //     push("/login");
-  //   }
-  // }, [user]);
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch(`${host}/user?id=${userId}`);
+      if (response.ok) {
+        const userData = await response.json();
+        setCurrentUser(userData);
+      } else {
+        console.error("Failed to fetch user data");
+      }
+    })()
+  }, []);
 
 
 
   if (user === null) {
     return (
       <View style={styles.containerCenter}>
-        {/* <Text style={{ ...styles.title, marginTop: 100, ...fontProps }}>
-          Not authenticated
-        </Text> */}
         <TouchableOpacity onPress={() => push("/login")}>
           <Text style={styles.link}>Login</Text>
         </TouchableOpacity>
@@ -93,25 +100,6 @@ const Profile = () => {
   };
 
   const totalItems = [...items, ...itemsVideo];
-  const [currentUser, setcurrentUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${host}/user?id=${userId}`);
-        if (response.ok) {
-          const userData = await response.json();
-          setcurrentUser(userData);
-        } else {
-          console.log("Failed to fetch user data");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const currentEmail = currentUser !== null ? currentUser.email : ""
   const currentName = currentUser !== null ? currentUser.name : ""
@@ -128,31 +116,28 @@ const Profile = () => {
               width: width / 4.0,
               height: width / 4.0,
               borderRadius: width / 4.0 / 2.0,
+              backgroundColor: "#fff",
             }}
           />
         </TouchableOpacity>
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: 'row' }}>
           <View style={{ marginRight: 5 }}>
-            <Text style={styles.statsItemValue}>{totalItems.length || ""}</Text>
+            <Text style={styles.statsItemValue}>{totalItems.length || "0"}</Text>
             <Text style={styles.statsItemKey}>posts</Text>
           </View>
-          <View style={{ marginRight: 5 }}>
-            <Text style={styles.statsItemValue}>446</Text>
-            <Text style={styles.statsItemKey}>followers</Text>
-          </View>
-          <View>
-            <Text style={styles.statsItemValue}>444</Text>
-            <Text style={styles.statsItemKey}>following</Text>
-          </View>
+          <TouchableOpacity onPress={() => navigate("pendingfriends")}>
+            <View style={{ marginRight: 5 }}>
+              <Text style={styles.statsItemValue}>{currentUser?.stats?.friends?.length || "0"}</Text>
+              <Text style={styles.statsItemKey}>Friends</Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
-      <View style={{ marginBottom: 8 }}>
+      <View style={{ marginBottom: 8, flexDirection: 'row' }}>
         <Text style={styles.description}>{currentDescription1}</Text>
         <Text style={styles.description}>{currentDescription2}</Text>
-        <Text style={styles.description}></Text>
-        <Text style={styles.description}>{userId && currentName}</Text>
-        <Text style={styles.description}>{userId ? currentEmail : user}</Text>
       </View>
+
       <View style={styles.MainContainer}>
         {userId && <ScrollView >
           <MediaElement userId={userId} elementIndex={0} />
